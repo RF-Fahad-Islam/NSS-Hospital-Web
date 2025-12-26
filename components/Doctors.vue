@@ -58,89 +58,97 @@ const getImageUrl = (path: string) => {
 
       <!-- Doctors Slider -->
       <div class="w-full">
-        <swiper
-          :modules="[Autoplay, Grid]"
-          :slides-per-view="1.2"
-          :space-between="20"
-          :loop="true"
-          :autoplay="{
-            delay: 3000,
-            disableOnInteraction: false,
-          }"
-          :breakpoints="{
-            '640': {
-              slidesPerView: 2,
-              spaceBetween: 20,
-            },
-            '768': {
-              slidesPerView: 3,
-              spaceBetween: 24,
-            },
-            '1280': {
-              slidesPerView: 3,
-              grid: {
-                rows: 2,
-                fill: 'row'
+        <ClientOnly>
+          <swiper
+            :modules="[Autoplay, Grid]"
+            :slides-per-view="1.2"
+            :space-between="20"
+            :loop="true"
+            :autoplay="{
+              delay: 3000,
+              disableOnInteraction: false,
+            }"
+            :breakpoints="{
+              '640': {
+                slidesPerView: 2,
+                spaceBetween: 20,
               },
-              spaceBetween: 24,
-            }
-          }"
-          class="doctors-swiper !pb-12"
-        >
-          <swiper-slide
-            v-for="(doctor, index) in displayedDoctors"
-            :key="doctor.id"
-            class="h-auto"
+              '768': {
+                slidesPerView: 3,
+                spaceBetween: 24,
+              },
+              '1280': {
+                slidesPerView: 3,
+                grid: {
+                  rows: 2,
+                  fill: 'row'
+                },
+                spaceBetween: 24,
+              }
+            }"
+            class="doctors-swiper !pb-12"
           >
-            <div class="doctor-card group h-full flex flex-col border border-border/40 rounded-xl overflow-hidden bg-card/50 hover:bg-card transition-colors">
-              <!-- Image Container -->
-              <div class="relative overflow-hidden aspect-[4/4]">
-                <img
-                  :src="getImageUrl(doctor.image)"
-                  :alt="doctor.name"
-                  loading="lazy"
-                  class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                />
-                <div class="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                
-                <!-- Hover Overlay Content -->
-                <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  <NuxtLink
-                    :to="`/doctors`"
-                    class="btn-primary w-full justify-center text-sm py-2.5"
-                  >
-                    View Profile
-                    <ArrowRight class="w-4 h-4 ml-2" />
-                  </NuxtLink>
-                </div>
-              </div>
-
-              <!-- Info -->
-              <div class="p-4 flex-grow flex flex-col justify-between">
-                <div>
-                  <div class="flex items-center gap-1 mb-2">
-                    <Star class="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span class="text-sm font-medium text-foreground">{{ doctor.rating }}</span>
-                    <span class="text-sm text-muted-foreground">• {{ doctor.experience }}</span>
+            <swiper-slide
+              v-for="(doctor, index) in displayedDoctors"
+              :key="doctor.id"
+              class="h-auto"
+            >
+              <div class="doctor-card group h-full flex flex-col border border-border/40 rounded-xl overflow-hidden bg-card/50 hover:bg-card transition-colors">
+                <!-- Image Container -->
+                <div class="relative overflow-hidden aspect-[4/4]">
+                  <img
+                    :src="getImageUrl(doctor.image)"
+                    :alt="doctor.name"
+                    loading="lazy"
+                    class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  
+                  <!-- Hover Overlay Content -->
+                  <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    <NuxtLink
+                      :to="`/doctors`"
+                      class="btn-primary w-full justify-center text-sm py-2.5"
+                    >
+                      View Profile
+                      <ArrowRight class="w-4 h-4 ml-2" />
+                    </NuxtLink>
                   </div>
-                  <h3 class="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-1" :title="doctor.name">
-                    {{ doctor.name }}
-                  </h3>
-                  <p class="text-sm text-secondary font-medium line-clamp-1" :title="doctor.specialty">{{ doctor.specialty }}</p>
                 </div>
 
-                <!-- Footer: Branch Info -->
-                <div v-if="doctor.branches" class="mt-4 pt-3 border-t border-border/50 flex items-start gap-2">
-                   <MapPin class="w-3.5 h-3.5 text-muted-foreground mt-0.5" />
-                   <div class="text-xs text-muted-foreground">
-                      <p class="font-medium text-foreground/80 line-clamp-1">{{ doctor.branches.name }}</p>
-                      <p class="line-clamp-1 opacity-80" :title="doctor.branches.address">{{ doctor.branches.address }}</p>
-                   </div>
+                <!-- Info -->
+                <div class="p-4 flex-grow flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center gap-1 mb-2">
+                      <Star class="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <span class="text-sm font-medium text-foreground">{{ doctor.rating }}</span>
+                      <span class="text-sm text-muted-foreground">• {{ doctor.experience }}</span>
+                    </div>
+                    <h3 class="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-1" :title="doctor.name">
+                      {{ doctor.name }}
+                    </h3>
+                    <p class="text-sm text-secondary font-medium line-clamp-1" :title="doctor.specialty">{{ doctor.specialty }}</p>
+                  </div>
+
+                  <!-- Footer: Branch Info -->
+                  <div v-if="doctor.branches" class="mt-4 pt-3 border-t border-border/50 flex items-start gap-2">
+                     <MapPin class="w-3.5 h-3.5 text-muted-foreground mt-0.5" />
+                     <div class="text-xs text-muted-foreground">
+                        <p class="font-medium text-foreground/80 line-clamp-1">{{ doctor.branches.name }}</p>
+                        <p class="line-clamp-1 opacity-80" :title="doctor.branches.address">{{ doctor.branches.address }}</p>
+                     </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </swiper-slide>
-        </swiper>
+            </swiper-slide>
+          </swiper>
+          <template #fallback>
+             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Simple Skeleton/Loading State -->
+                <div v-for="i in 3" :key="i" class="h-[400px] bg-muted/20 animate-pulse rounded-xl"></div>
+             </div>
+          </template>
+        </ClientOnly>
       </div>
 
       <!-- CTA -->
