@@ -13,7 +13,7 @@ const stats = [
     <!-- Background Image with Overlay -->
     <div class="absolute inset-0">
       <img :src="heroImage" alt="Modern healthcare facility" class="w-full h-full object-cover" />
-      <div class="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/80 to-secondary/70" />
+      <div class="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/60 to-secondary/30" />
     </div>
 
     <!-- Content -->
@@ -30,7 +30,7 @@ const stats = [
 
           <h1 class="heading-xl text-primary-foreground mb-6 animate-fade-up opacity-0 stagger-1 text-balance">
             <span class="block text-5xl md:text-7xl font-extrabold tracking-tight mb-2">NSS</span>
-            <span class="block text-3xl md:text-5xl font-bold text-secondary mb-4">Ma Shastho Seba Kendra</span>
+            <span class="block text-3xl md:text-5xl font-bold tracking-tight mb-4">Ma Shastho Seba Kendra</span>
             <span class="text-secondary-foreground/90 text-2xl md:text-3xl font-medium block">People Participation for Social Change</span>
           </h1>
 
