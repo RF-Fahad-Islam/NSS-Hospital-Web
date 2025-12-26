@@ -29,8 +29,8 @@ const stats = [
           </div>
 
           <h1 class="heading-xl text-primary-foreground mb-6 animate-fade-up opacity-0 stagger-1 text-balance">
-            <span class="block text-5xl md:text-7xl font-extrabold tracking-tight mb-2 color-blue-800">NSS</span>
-            <span class="block text-3xl md:text-5xl font-bold text-secondary mb-4 color-red-300">Ma Shastho Seba Kendra</span>
+            <span class="block text-5xl md:text-7xl font-extrabold tracking-tight mb-2">NSS</span>
+            <span class="block text-3xl md:text-5xl font-bold text-secondary mb-4">Ma Shastho Seba Kendra</span>
             <span class="text-secondary-foreground/90 text-2xl md:text-3xl font-medium block">People Participation for Social Change</span>
           </h1>
 

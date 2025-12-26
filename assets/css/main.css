@@ -15,7 +15,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 215 50% 15%;
 
-    --primary: 210 100% 35%;
+    --primary: 210 100% 45%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 175 45% 45%;
@@ -32,29 +32,29 @@
 
     --border: 210 20% 90%;
     --input: 210 20% 90%;
-    --ring: 210 100% 35%;
+    --ring: 210 100% 45%;
 
     --radius: 0.75rem;
 
     /* Custom Medical Theme Variables */
-    --medical-blue: 210 100% 35%;
-    --medical-blue-light: 210 100% 45%;
+    --medical-blue: 210 100% 45%;
+    --medical-blue-light: 210 100% 55%;
     --medical-teal: 175 45% 45%;
     --medical-teal-light: 175 45% 92%;
     --medical-navy: 215 50% 15%;
     --medical-gray: 210 20% 96%;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(210 100% 35% / 0.95), hsl(175 45% 35% / 0.85));
-    --gradient-stats: linear-gradient(90deg, hsl(210 100% 35%), hsl(175 45% 45%));
+    --gradient-hero: linear-gradient(135deg, hsl(210 100% 45% / 0.95), hsl(175 45% 35% / 0.85));
+    --gradient-stats: linear-gradient(90deg, hsl(210 100% 45%), hsl(175 45% 45%));
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 20% 98%));
 
     /* Shadows */
-    --shadow-sm: 0 2px 8px hsl(210 100% 35% / 0.06);
-    --shadow-md: 0 8px 24px hsl(210 100% 35% / 0.08);
-    --shadow-lg: 0 16px 48px hsl(210 100% 35% / 0.12);
-    --shadow-card: 0 4px 20px hsl(210 100% 35% / 0.08);
-    --shadow-card-hover: 0 12px 40px hsl(210 100% 35% / 0.15);
+    --shadow-sm: 0 2px 8px hsl(210 100% 45% / 0.06);
+    --shadow-md: 0 8px 24px hsl(210 100% 45% / 0.08);
+    --shadow-lg: 0 16px 48px hsl(210 100% 45% / 0.12);
+    --shadow-card: 0 4px 20px hsl(210 100% 45% / 0.08);
+    --shadow-card-hover: 0 12px 40px hsl(210 100% 45% / 0.15);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;

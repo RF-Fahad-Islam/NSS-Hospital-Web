@@ -10,5 +10,11 @@ export default defineNuxtConfig({
   },
   app: {
     pageTransition: { name: 'page', mode: 'out-in' }
+  },
+  runtimeConfig: {
+    public: {
+      supabaseUrl: process.env.VITE_SUPABASE_URL,
+      supabaseKey: process.env.VITE_SUPABASE_PUBLISHABLE_KEY
+    }
   }
 })

@@ -1,7 +1,19 @@
 import { createClient } from '@supabase/supabase-js'
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || ''
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || ''
+const getEnv = (key: string, publicKey: string) => {
+    // Try process.env first (Server-side / Vercel)
+    if (typeof process !== 'undefined' && process.env && process.env[key]) {
+        return process.env[key]
+    }
+    // Try import.meta.env (Client-side / Vite)
+    if (import.meta && import.meta.env && import.meta.env[key]) {
+        return import.meta.env[key]
+    }
+    return ''
+}
+
+const SUPABASE_URL = getEnv('VITE_SUPABASE_URL', 'supabaseUrl')
+const SUPABASE_PUBLISHABLE_KEY = getEnv('VITE_SUPABASE_PUBLISHABLE_KEY', 'supabaseKey')
 
 // Mock client to prevent crash if keys are missing
 const mockClient = {
