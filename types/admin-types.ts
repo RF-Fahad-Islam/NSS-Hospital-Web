@@ -7,6 +7,7 @@ export interface BranchForm {
     map_url: string
     image: string
     manager_name?: string
+    sequence?: number
 }
 
 export interface DoctorForm {
@@ -20,7 +21,8 @@ export interface DoctorForm {
     education: string
     bio: string
     available_days: string[]
-    is_doctor: boolean
+    role: 'doctor' | 'staff' | 'management'
+    sequence?: number
 }
 
 export interface ServiceForm {

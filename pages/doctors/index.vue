@@ -18,7 +18,7 @@ interface Doctor {
     address: string
     name: string
   } | null
-  is_doctor?: boolean
+  role?: 'doctor' | 'staff' | 'management'
 }
 
 useHead({
@@ -63,8 +63,7 @@ const filteredDoctors = computed(() => {
   let list = doctors.value || []
   
   // Filter by Category (Doctor vs Staff)
-  const isDoctor = selectedCategory.value === 'doctors'
-  list = list.filter(d => !!d.is_doctor === isDoctor)
+  list = list.filter(d => d.role === (selectedCategory.value === 'doctors' ? 'doctor' : 'staff'))
 
   // Filter by branch address
   if (selectedBranch.value !== 'all') {

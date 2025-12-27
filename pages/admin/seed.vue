@@ -94,7 +94,7 @@ const seedDatabase = async () => {
         bio: d.bio,
         languages: d.languages,
         available_days: d.availableDays,
-        is_doctor: d.isDoctor
+        role: d.isDoctor ? 'doctor' : 'staff'
       })))
 
     if (doctorError) throw doctorError

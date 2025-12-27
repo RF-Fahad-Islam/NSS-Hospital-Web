@@ -25,7 +25,7 @@ const { data: doctors } = await useAsyncData('doctors-home', async () => {
   const { data } = await supabase
     .from('doctors')
     .select('id, name, image, branch_id')
-    // .eq('is_doctor', true) // Temporarily disabled for debugging
+    .eq('role', 'doctor')
   return (data as any[]) || []
 })
 

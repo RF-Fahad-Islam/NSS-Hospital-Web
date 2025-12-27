@@ -3,13 +3,14 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { 
   Bell, Calendar, LogOut, Clock, User, Phone, Mail, 
   CheckCircle, XCircle, Eye, Loader2, Stethoscope, Building2,
-  Plus, Edit, Trash2, X, Save, Search, BarChart3, TrendingUp, Globe
+  Plus, Edit, Trash2, X, Save, Search, BarChart3, TrendingUp, Globe, GripVertical
 } from 'lucide-vue-next'
 import { format, subDays, startOfDay, endOfDay, eachDayOfInterval } from 'date-fns'
 import { supabase } from '@/lib/supabase'
 import type { Branch, Doctor, Service, BranchForm, DoctorForm, ServiceForm, GalleryItem, GalleryForm } from '@/types/admin-types'
 import ImageUpload from '@/components/ImageUpload.vue'
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard.vue'
+import draggable from 'vuedraggable'
 
 definePageMeta({
   layout: false
@@ -52,7 +53,8 @@ const branchForm = ref<BranchForm>({
   email: '',
   map_url: '',
   image: '',
-  manager_name: ''
+  manager_name: '',
+  sequence: 0
 })
 
 // Doctors state
@@ -69,10 +71,11 @@ const doctorForm = ref<DoctorForm>({
   education: '',
   bio: '',
 
-  available_days: ['Everyday'],
-  is_doctor: true
+  available_days: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+  role: 'staff',
+  sequence: 0
 })
-const doctorFilter = ref<'all' | 'doctor' | 'staff'>('all')
+const doctorFilter = ref<'all' | 'doctor' | 'staff' | 'management'>('all')
 const selectedBranchFilter = ref<string>('all')
 
 // Services state
@@ -128,8 +131,7 @@ const filteredDoctors = computed(() => {
   }
 
   if (doctorFilter.value !== 'all') {
-    const isDoctor = doctorFilter.value === 'doctor'
-    filtered = filtered.filter(d => d.is_doctor === isDoctor)
+    filtered = filtered.filter(d => d.role === doctorFilter.value)
   }
 
   if (selectedBranchFilter.value !== 'all') {
@@ -186,6 +188,7 @@ const fetchBranches = async () => {
     const { data, error } = await supabase
       .from('branches')
       .select('*')
+      .order('sequence', { ascending: true })
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -200,6 +203,7 @@ const fetchDoctors = async () => {
     const { data, error } = await supabase
       .from('doctors')
       .select('*')
+      .order('sequence', { ascending: true })
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -256,7 +260,9 @@ const resetBranchForm = () => {
     phone: '',
     email: '',
     map_url: '',
-    image: ''
+    image: '',
+    manager_name: '',
+    sequence: 0
   }
 }
 
@@ -269,7 +275,8 @@ const saveBranch = async () => {
       email: branchForm.value.email,
       map_url: branchForm.value.map_url,
       image: branchForm.value.image,
-      manager_name: branchForm.value.manager_name
+      manager_name: branchForm.value.manager_name,
+      sequence: branchForm.value.sequence || 0
     }
 
     if (editingBranch.value) {
@@ -326,9 +333,9 @@ const openDoctorForm = (doctor?: Doctor) => {
     // Ensure arrays are initialized even if null in DB
     formData.available_days = Array.isArray(formData.available_days) ? formData.available_days : []
     
-    // Ensure is_doctor is boolean (default to true for legacy records)
-    if (formData.is_doctor === undefined || formData.is_doctor === null) {
-        formData.is_doctor = true
+    // Ensure role is set (default to 'doctor' for legacy records)
+    if (formData.role === undefined || formData.role === null) {
+        formData.role = 'doctor'
     }
 
     // Verify branch exists (using address as key per user request)
@@ -362,8 +369,9 @@ const resetDoctorForm = () => {
     branch_id: '',
     education: '',
     bio: '',
-    available_days: ['Everyday'],
-    is_doctor: true
+    available_days: ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    role: 'staff',
+    sequence: 0
   }
 }
 
@@ -389,7 +397,8 @@ const saveDoctor = async () => {
       education: doctorForm.value.education,
       bio: doctorForm.value.bio,
       available_days: doctorForm.value.available_days,
-      is_doctor: doctorForm.value.is_doctor
+      role: doctorForm.value.role,
+      sequence: doctorForm.value.sequence || 0
     }
 
     console.log('Saving doctor payload:', payload)
@@ -413,8 +422,8 @@ const saveDoctor = async () => {
     await fetchDoctors()
   } catch (error: any) {
     console.error('Error saving doctor:', error)
-    if (error.message?.includes('is_doctor')) {
-        alert('Critical Error: Database schema missing "is_doctor" column.\nPlease run the "add_is_doctor_column.sql" script in Supabase SQL Editor.')
+    if (error.message?.includes('role')) {
+        alert('Critical Error: Database schema missing "role" column.\\nPlease run the "replace_is_doctor_with_role.sql" script in Supabase SQL Editor.')
     } else {
         alert(`Failed to save doctor: ${error.message || 'Unknown error'}`)
     }
@@ -439,6 +448,43 @@ const executeDeleteDoctor = async (id: string) => {
   } catch (error: any) {
     console.error('Error deleting doctor:', error)
     alert(`Failed to delete doctor: ${error.message || 'Unknown error'}`)
+  }
+}
+
+// Drag and drop reordering functions
+const updateBranchOrder = async () => {
+  try {
+    // Update sequence for each branch based on its current position
+    const updates = branches.value.map((branch, index) => 
+      supabase
+        .from('branches')
+        .update({ sequence: index })
+        .eq('id', branch.id)
+    )
+    
+    await Promise.all(updates)
+  } catch (error: any) {
+    console.error('Error updating branch order:', error)
+    alert(`Failed to update branch order: ${error.message || 'Unknown error'}`)
+    await fetchBranches() // Revert on error
+  }
+}
+
+const updateDoctorOrder = async () => {
+  try {
+    // Update sequence for each doctor based on its current position
+    const updates = filteredDoctors.value.map((doctor, index) => 
+      supabase
+        .from('doctors')
+        .update({ sequence: index })
+        .eq('id', doctor.id)
+    )
+    
+    await Promise.all(updates)
+  } catch (error: any) {
+    console.error('Error updating doctor order:', error)
+    alert(`Failed to update doctor order: ${error.message || 'Unknown error'}`)
+    await fetchDoctors() // Revert on error
   }
 }
 
@@ -874,44 +920,54 @@ const handleLogout = async () => {
           </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div
-            v-for="branch in filteredBranches"
-            :key="branch.id"
-            class="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-shadow"
-          >
-            <img :src="branch.image" :alt="branch.name" class="w-full h-48 object-cover" />
-            <div class="p-6">
-              <h3 class="font-semibold text-lg text-foreground mb-2">{{ branch.name }}</h3>
-              <p class="text-sm text-muted-foreground mb-4">{{ branch.address }}</p>
-              <div class="space-y-2 mb-4">
-                <div class="flex items-center gap-2 text-sm">
-                  <Phone class="w-4 h-4 text-muted-foreground" />
-                  <span class="text-foreground">{{ branch.phone }}</span>
-                </div>
-                <div class="flex items-center gap-2 text-sm">
-                  <Mail class="w-4 h-4 text-muted-foreground" />
-                  <span class="text-foreground">{{ branch.email }}</span>
-                </div>
+        <draggable 
+          v-model="branches" 
+          @end="updateBranchOrder"
+          item-key="id"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          :animation="200"
+          handle=".drag-handle"
+        >
+          <template #item="{element: branch}">
+            <div
+              class="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-shadow relative group"
+            >
+              <div class="drag-handle absolute top-2 left-2 z-10 cursor-move p-2 bg-background/80 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                <GripVertical class="w-5 h-5 text-muted-foreground" />
               </div>
-              <div class="flex gap-2">
-                <button
-                  @click="openBranchForm(branch)"
-                  class="flex-1 px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors flex items-center justify-center gap-2"
-                >
-                  <Edit class="w-4 h-4" />
-                  Edit
-                </button>
-                <button
-                  @click="deleteBranch(branch.id)"
-                  class="px-4 py-2 border border-destructive text-destructive rounded-lg hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                >
-                  <Trash2 class="w-4 h-4" />
-                </button>
+              <img :src="branch.image" :alt="branch.name" class="w-full h-48 object-cover" />
+              <div class="p-6">
+                <h3 class="font-semibold text-lg text-foreground mb-2">{{ branch.name }}</h3>
+                <p class="text-sm text-muted-foreground mb-4">{{ branch.address }}</p>
+                <div class="space-y-2 mb-4">
+                  <div class="flex items-center gap-2 text-sm">
+                    <Phone class="w-4 h-4 text-muted-foreground" />
+                    <span class="text-foreground">{{ branch.phone }}</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-sm">
+                    <Mail class="w-4 h-4 text-muted-foreground" />
+                    <span class="text-foreground">{{ branch.email }}</span>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <button
+                    @click="openBranchForm(branch)"
+                    class="flex-1 px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Edit class="w-4 h-4" />
+                    Edit
+                  </button>
+                  <button
+                    @click="deleteBranch(branch.id)"
+                    class="px-4 py-2 border border-destructive text-destructive rounded-lg hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                  >
+                    <Trash2 class="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </template>
+        </draggable>
       </div>
 
       <!-- Doctors Tab -->
@@ -953,6 +1009,17 @@ const handleLogout = async () => {
               >
                 Staff
               </button>
+              <button
+                @click="doctorFilter = 'management'"
+                :class="[
+                  'px-3 py-1.5 rounded-md text-sm font-medium transition-all',
+                  doctorFilter === 'management'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                ]"
+              >
+                Managers
+              </button>
             </div>
             
              <!-- NEW Branch Filter Dropdown -->
@@ -973,43 +1040,53 @@ const handleLogout = async () => {
           </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div
-            v-for="doctor in filteredDoctors"
-            :key="doctor.id"
-            class="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-shadow"
-          >
-            <img :src="doctor.image" :alt="doctor.name" class="w-full h-48 object-cover" />
-            <div class="p-6">
-              <h3 class="font-semibold text-lg text-foreground mb-1">{{ doctor.name }}</h3>
-              <p class="text-sm text-primary mb-2">{{ doctor.specialty }}</p>
-              <p class="text-sm text-muted-foreground mb-4">{{ doctor.experience }} • Rating: {{ doctor.rating }}</p>
-              <div class="flex gap-2">
-                <button
-                  @click="openDoctorForm(doctor)"
-                  class="flex-1 px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors flex items-center justify-center gap-2"
-                >
-                  <Edit class="w-4 h-4" />
-                  Edit
-                </button>
-                <button
-                  @click="deleteDoctor(doctor.id)"
-                  class="px-4 py-2 border border-destructive text-destructive rounded-lg hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                >
-                  <Trash2 class="w-4 h-4" />
-                </button>
+        <draggable 
+          v-model="doctors" 
+          @end="updateDoctorOrder"
+          item-key="id"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          :animation="200"
+          handle=".drag-handle"
+        >
+          <template #item="{element: doctor}">
+            <div
+              class="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-shadow relative group"
+            >
+              <div class="drag-handle absolute top-2 left-2 z-10 cursor-move p-2 bg-background/80 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                <GripVertical class="w-5 h-5 text-muted-foreground" />
               </div>
-              
-              <div class="mt-4 pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-                 <span class="flex items-center gap-1">
-                   <Building2 class="w-3 h-3" />
-                   {{ branches.find(b => b.address === doctor.branch_id)?.name || 'Unknown Branch' }}
-                 </span>
+              <img :src="doctor.image" :alt="doctor.name" class="w-full h-48 object-cover" />
+              <div class="p-6">
+                <h3 class="font-semibold text-lg text-foreground mb-1">{{ doctor.name }}</h3>
+                <p class="text-sm text-primary mb-2">{{ doctor.specialty }}</p>
+                <p class="text-sm text-muted-foreground mb-4">{{ doctor.experience }} • Rating: {{ doctor.rating }}</p>
+                <div class="flex gap-2">
+                  <button
+                    @click="openDoctorForm(doctor)"
+                    class="flex-1 px-4 py-2 border border-border rounded-lg hover:bg-muted transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Edit class="w-4 h-4" />
+                    Edit
+                  </button>
+                  <button
+                    @click="deleteDoctor(doctor.id)"
+                    class="px-4 py-2 border border-destructive text-destructive rounded-lg hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                  >
+                    <Trash2 class="w-4 h-4" />
+                  </button>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+                   <span class="flex items-center gap-1">
+                     <Building2 class="w-3 h-3" />
+                     {{ branches.find(b => b.address === doctor.branch_id)?.name || 'Unknown Branch' }}
+                   </span>
 
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </template>
+        </draggable>
       </div>
 
       <!-- Services Tab -->
@@ -1326,16 +1403,17 @@ const handleLogout = async () => {
               />
             </div>
             
-            <div class="flex items-center pt-6">
-               <label class="flex items-center gap-2 cursor-pointer">
-                 <input 
-                   type="checkbox" 
-                   v-model="doctorForm.is_doctor"
-                   class="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-                 >
-                 <span class="text-sm font-medium text-foreground">Is Doctor?</span>
-               </label>
-               <span class="text-xs text-muted-foreground ml-2">(Uncheck for Staff)</span>
+            
+            <div>
+               <label class="block text-sm font-medium text-foreground mb-2">Role</label>
+               <select
+                 v-model="doctorForm.role"
+                 class="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+               >
+                 <option value="doctor">Doctor</option>
+                 <option value="staff">Staff</option>
+                 <option value="management">Management</option>
+               </select>
             </div>
           </div>
           

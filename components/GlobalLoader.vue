@@ -25,7 +25,7 @@ defineProps<{
       
       <div class="mt-8 flex flex-col items-center gap-2">
         <h3 class="text-xl font-bold text-primary tracking-tight">NSS</h3>
-        <p class="text-sm text-muted-foreground animate-pulse">Ma Shasthya Seba Kendra</p>
+        <p class="text-sm text-muted-foreground animate-pulse">মা স্বাস্থ্য সেবা কেন্দ্র</p>
       </div>
     </div>
   </Transition>

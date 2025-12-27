@@ -29,7 +29,7 @@ const { data: doctors } = await useAsyncData('doctors-home', async () => {
   const { data } = await supabase
     .from('doctors')
     .select('*')
-    .eq('is_doctor', true)
+    .eq('role', 'doctor')
     .limit(18)
   
   return data as Doctor[]
@@ -38,7 +38,7 @@ const { data: doctors } = await useAsyncData('doctors-home', async () => {
 const displayedDoctors = computed(() => {
   if (!doctors.value) return []
   return doctors.value.map(d => {
-    const branch = (branches.value || []).find(b => b.id === d.branch_id)
+    const branch = (branches.value || []).find((b: any) => b.id === d.branch_id)
     return {
       ...d,
       branches: branch ? { name: branch.name, address: branch.address } : undefined

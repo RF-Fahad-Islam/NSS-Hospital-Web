@@ -27,6 +27,7 @@ interface Doctor {
   name: string
   image: string
   branch_id: string
+  role?: 'doctor' | 'staff' | 'management'
 }
 
 // Fetch branches
@@ -46,17 +47,20 @@ const filteredBranches = computed(() => {
   )
 })
 
-// Fetch all doctors for counts
+// Fetch all doctors for counts and management for display
 const { data: doctors } = await useAsyncData<Doctor[]>('doctors-all', async () => {
   const { data } = await supabase
     .from('doctors')
-    .select('id, name, image, branch_id')
-    // .eq('is_doctor', true)
+    .select('id, name, image, branch_id, role')
   return (data as any) || []
 })
 
 const getDoctorCount = (branchId: string) => {
-  return (doctors.value || []).filter((d) => d.branch_id === branchId).length
+  return (doctors.value || []).filter((d) => d.branch_id === branchId && d.role === 'doctor').length
+}
+
+const getManager = (branchAddress: string) => {
+  return (doctors.value || []).find((d) => d.branch_id === branchAddress && d.role === 'management')
 }
 
 const getBranchDoctors = (branchId: string) => {
@@ -141,6 +145,19 @@ const getImageUrl = (path: string) => {
               <div class="absolute top-6 left-6 bg-primary text-primary-foreground px-4 py-2 rounded-full flex items-center gap-2 shadow-lg z-10">
                 <Users class="w-4 h-4" />
                 <span class="text-sm font-bold tracking-wide">{{ getDoctorCount(branch.address) }} ডাক্তার</span>
+              </div>
+              
+              <!-- Manager Badge -->
+              <div v-if="getManager(branch.address)" class="absolute bottom-6 right-6 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 flex items-center gap-2 shadow-lg z-10 border border-primary/20">
+                <img 
+                  :src="getManager(branch.address)?.image || '/images/placeholder-doctor.jpg'" 
+                  :alt="getManager(branch.address)?.name"
+                  class="w-8 h-8 rounded-full object-cover border-2 border-primary"
+                />
+                <div class="text-left">
+                  <div class="text-[10px] text-muted-foreground uppercase tracking-wide">Manager</div>
+                  <div class="text-sm font-semibold text-foreground leading-tight">{{ getManager(branch.address)?.name }}</div>
+                </div>
               </div>
             </div>
 
