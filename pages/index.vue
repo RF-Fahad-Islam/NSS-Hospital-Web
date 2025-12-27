@@ -15,6 +15,6 @@ useHead({
     <Services />
     <Doctors />
     <Branches />
-    <AppointmentForm />
+    <!-- <AppointmentForm /> -->
   </div>
 </template>

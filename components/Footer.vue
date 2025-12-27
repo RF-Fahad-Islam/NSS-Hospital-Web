@@ -8,24 +8,27 @@ import {
   Twitter,
   Instagram,
   Linkedin,
-  ArrowRight
+  ArrowRight,
+  Globe,
+  Smartphone,
+  Printer
 } from 'lucide-vue-next'
 
 const quickLinks = [
-  { name: 'About Us', href: '#about' },
-  { name: 'Services', href: '#services' },
-  { name: 'Doctors & Staff', href: '#doctors' },
-  { name: 'Appointments', href: '#appointment' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'আমাদের সম্পর্কে', href: '/about-us' },
+  { name: 'সেবাসমূহ', href: '/services' },
+  { name: 'ডাক্তার ও স্টাফ', href: '/doctors' },
+  { name: 'অ্যাপয়েন্টমেন্ট', href: '#appointment' },
+  { name: 'যোগাযোগ', href: '#contact' },
 ]
 
 const services = [
-  'Cardiology',
-  'Pediatrics',
-  'Neurology',
-  'Orthopedics',
-  'Emergency Care',
-  'Laboratory',
+  'কার্ডিওলজি',
+  'শিশুরোগ',
+  'স্নায়ুরোগ',
+  'অর্থোপেডিক্স',
+  'জরুরী সেবা',
+  'ল্যাবরেটরি',
 ]
 
 const socialLinks = [
@@ -44,16 +47,10 @@ const socialLinks = [
         <!-- Brand Column -->
         <div class="lg:col-span-1">
           <a href="#" class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <span class="text-primary-foreground font-bold text-lg">N</span>
-            </div>
-            <span class="text-xl font-bold text-background">
-              NSS
-            </span>
+            <img src="/images/nss-footer-logo.png" alt="NSS Logo" class="h-16 w-auto object-contain bg-white rounded-lg p-1" />
           </a>
           <p class="text-background/70 mb-6 leading-relaxed">
-            Providing compassionate healthcare with advanced medical technology 
-            for over 35 years.
+            সামাজিক পরিবর্তনের জন্য জনগণের অংশগ্রহণ
           </p>
           <div class="flex gap-3">
             <a
@@ -70,7 +67,7 @@ const socialLinks = [
 
         <!-- Quick Links -->
         <div>
-          <h4 class="font-semibold text-lg mb-6">Quick Links</h4>
+          <h4 class="font-semibold text-lg mb-6">দ্রুত লিঙ্ক</h4>
           <ul class="space-y-3">
             <li v-for="link in quickLinks" :key="link.name">
               <a
@@ -86,7 +83,7 @@ const socialLinks = [
 
         <!-- Services -->
         <div>
-          <h4 class="font-semibold text-lg mb-6">Our Services</h4>
+          <h4 class="font-semibold text-lg mb-6">আমাদের সেবাসমূহ</h4>
           <ul class="space-y-3">
             <li v-for="service in services" :key="service">
               <a
@@ -102,33 +99,48 @@ const socialLinks = [
 
         <!-- Contact Info -->
         <div>
-          <h4 class="font-semibold text-lg mb-6">Contact Us</h4>
+          <h4 class="font-semibold text-lg mb-6">যোগাযোগ করুন</h4>
           <ul class="space-y-4">
             <li class="flex items-start gap-3">
               <MapPin class="w-5 h-5 text-secondary shrink-0 mt-0.5" />
               <span class="text-background/70">
-                123 Healthcare Avenue<br />
-                Medical District, NY 10001
+                নাসরিন প্যালেস (২য় তলা) কেএন লেন<br />
+                একে স্কুল রোড, উপজেলা: আমতলী<br />
+                জেলা: বরগুনা-৮৭১০, বাংলাদেশ
               </span>
             </li>
             <li>
-              <a href="tel:+18001234567" class="flex items-center gap-3 text-background/70 hover:text-secondary transition-colors">
-                <Phone class="w-5 h-5 text-secondary shrink-0" />
-                1-800-123-4567
-              </a>
+              <div class="flex items-start gap-3 text-background/70">
+                <Phone class="w-5 h-5 text-secondary shrink-0 mt-1" />
+                <div class="flex flex-col">
+                  <a href="tel:+880445256054" class="hover:text-secondary transition-colors">ফোন: +৮৮ ০৪৪৫২ ৫৬০৫৪</a>
+                  <span class="flex items-center gap-2">
+                    <Printer class="w-4 h-4 ml-0" /> ফ্যাক্স: +৮৮ ০৪৪৫২ ৫৬১৬৪
+                  </span>
+                </div>
+              </div>
             </li>
             <li>
-              <a href="mailto:info@nss.com" class="flex items-center gap-3 text-background/70 hover:text-secondary transition-colors">
+               <div class="flex items-start gap-3 text-background/70">
+                <Smartphone class="w-5 h-5 text-secondary shrink-0 mt-1" />
+                <div class="flex flex-col">
+                  <span class="font-medium mb-1">মোবাইল:</span>
+                  <a href="tel:+8801712795359" class="hover:text-secondary transition-colors">+৮৮ ০ ১৭১২ ৭৯৫৩৫৯</a>
+                  <a href="tel:+8801733096000" class="hover:text-secondary transition-colors">+৮৮ ০ ১৭৩৩ ০৯৬০০০</a>
+                </div>
+              </div>
+            </li>
+            <li>
+              <a href="mailto:nssngo@gmail.com" class="flex items-center gap-3 text-background/70 hover:text-secondary transition-colors">
                 <Mail class="w-5 h-5 text-secondary shrink-0" />
-                info@nss.com
+                nssngo@gmail.com
               </a>
             </li>
-            <li class="flex items-start gap-3">
-              <Clock class="w-5 h-5 text-secondary shrink-0 mt-0.5" />
-              <span class="text-background/70">
-                Mon - Fri: 8:00 AM - 8:00 PM<br />
-                Sat - Sun: 9:00 AM - 5:00 PM
-              </span>
+            <li>
+              <a href="http://www.nssngo.org" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 text-background/70 hover:text-secondary transition-colors">
+                <Globe class="w-5 h-5 text-secondary shrink-0" />
+                www.nssngo.org
+              </a>
             </li>
           </ul>
         </div>
@@ -138,17 +150,17 @@ const socialLinks = [
       <div class="mt-12 pt-10 border-t border-background/10">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <h4 class="font-semibold text-lg mb-2">Subscribe to Our Newsletter</h4>
-            <p class="text-background/70">Get health tips and updates delivered to your inbox.</p>
+            <h4 class="font-semibold text-lg mb-2">আমাদের নিউজলেটার সাবস্ক্রাইব করুন</h4>
+            <p class="text-background/70">আপনার ইনবক্সে স্বাস্থ্য টিপস এবং আপডেট পান।</p>
           </div>
           <form class="flex gap-3 w-full md:w-auto" @submit.prevent>
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder="আপনার ইমেল লিখুন"
               class="flex-1 md:w-64 px-4 py-3 bg-background/10 border border-background/20 rounded-lg text-background placeholder:text-background/50 focus:outline-none focus:ring-2 focus:ring-secondary/50"
             />
             <button type="submit" class="btn-secondary shrink-0">
-              Subscribe
+              সাবস্ক্রাইব
             </button>
           </form>
         </div>
@@ -159,11 +171,11 @@ const socialLinks = [
     <div class="border-t border-background/10">
       <div class="section-container py-6">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-background/60">
-          <p>© 2024 NSS. All rights reserved.</p>
+          <p>© ২০২৪ এনএসএস। সর্বস্বত্ব সংরক্ষিত।</p>
           <div class="flex gap-6">
-            <a href="#" class="hover:text-secondary transition-colors">Privacy Policy</a>
-            <a href="#" class="hover:text-secondary transition-colors">Terms of Service</a>
-            <NuxtLink to="/admin" class="hover:text-secondary transition-colors">Admin</NuxtLink>
+            <a href="#" class="hover:text-secondary transition-colors">গোপনীয়তা নীতি</a>
+            <a href="#" class="hover:text-secondary transition-colors">সেবার শর্তাবলী</a>
+            <NuxtLink to="/admin" class="hover:text-secondary transition-colors">অ্যাডমিন</NuxtLink>
           </div>
         </div>
       </div>

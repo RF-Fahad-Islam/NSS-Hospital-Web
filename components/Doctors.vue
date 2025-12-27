@@ -20,16 +20,30 @@ interface Doctor {
   }
 }
 
+const { data: branches } = await useAsyncData('branches-data', async () => {
+  const { data } = await supabase.from('branches').select('id, name, address')
+  return data || []
+})
+
 const { data: doctors } = await useAsyncData('doctors-home', async () => {
   const { data } = await supabase
     .from('doctors')
-    .select('*, branches(name, address)')
-    .limit(18) // Increased limit to fill the grid
+    .select('*')
+    .limit(18)
   
   return data as Doctor[]
 })
 
-const displayedDoctors = computed(() => doctors.value || [])
+const displayedDoctors = computed(() => {
+  if (!doctors.value) return []
+  return doctors.value.map(d => {
+    const branch = (branches.value || []).find(b => b.id === d.branch_id)
+    return {
+      ...d,
+      branches: branch ? { name: branch.name, address: branch.address } : undefined
+    }
+  })
+})
 
 const getImageUrl = (path: string) => {
   if (!path) return ''
@@ -45,14 +59,13 @@ const getImageUrl = (path: string) => {
       <!-- Section Header -->
       <div class="text-center max-w-2xl mx-auto mb-16">
         <span class="text-secondary font-semibold tracking-wide uppercase text-sm">
-          Our Team
+          আমাদের টিম
         </span>
         <h2 class="heading-lg text-foreground mt-3 mb-4">
-          Meet Our Medical Team
+          আমাদের বিশেষজ্ঞ চিকিৎসকদের সাথে পরিচিত হোন
         </h2>
         <p class="text-muted-foreground text-lg">
-          Our team of highly qualified physicians brings decades of experience 
-          and a genuine commitment to your well-being.
+          আমাদের উচ্চ যোগ্যতাসম্পন্ন চিকিৎসকদের দল দীর্ঘদিনের অভিজ্ঞতা এবং আপনার সুস্থতার প্রতি অকৃত্রিম প্রতিশ্রুতি নিয়ে সেবা প্রদান করেন।
         </p>
       </div>
 
@@ -110,7 +123,7 @@ const getImageUrl = (path: string) => {
                       :to="`/doctors`"
                       class="btn-primary w-full justify-center text-sm py-2.5"
                     >
-                      View Profile
+                      প্রোফাইল দেখুন
                       <ArrowRight class="w-4 h-4 ml-2" />
                     </NuxtLink>
                   </div>
@@ -154,7 +167,7 @@ const getImageUrl = (path: string) => {
       <!-- CTA -->
       <div class="text-center mt-4">
         <NuxtLink to="/doctors" class="btn-secondary">
-          View Full Team
+          সম্পূর্ণ টিম দেখুন
         </NuxtLink>
       </div>
     </div>

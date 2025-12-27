@@ -3,9 +3,9 @@ import { MapPin, Phone, Mail, Clock, Users, ArrowRight } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
 useHead({
-  title: 'Our Locations - NSS Ma Shastho Seba Kendra',
+  title: 'আমাদের অবস্থান - এনএসএস মা স্বাস্থ্য সেবা কেন্দ্র',
   meta: [
-    { name: 'description', content: 'Find an NSS Ma Shastho Seba Kendra branch near you.' }
+    { name: 'description', content: 'আপনার নিকটস্থ এনএসএস মা স্বাস্থ্য সেবা কেন্দ্রের শাখা খুঁজুন।' }
   ]
 })
 
@@ -19,6 +19,8 @@ interface Branch {
   map_url: string
 }
 
+const searchQuery = ref('')
+
 interface Doctor {
   id: string
   name: string
@@ -27,14 +29,28 @@ interface Doctor {
 }
 
 // Fetch branches
-const { data: branches } = await useAsyncData<Branch[]>('branches-page', async () => {
+const { data: rawBranches } = await useAsyncData<Branch[]>('branches-page', async () => {
   const { data } = await supabase.from('branches').select('*')
   return (data as any) || []
 })
 
+const filteredBranches = computed(() => {
+  const list = rawBranches.value || []
+  if (!searchQuery.value.trim()) return list
+  
+  const query = searchQuery.value.toLowerCase().trim()
+  return list.filter(branch => 
+    branch.name.toLowerCase().includes(query) || 
+    branch.address.toLowerCase().includes(query)
+  )
+})
+
 // Fetch all doctors for counts
 const { data: doctors } = await useAsyncData<Doctor[]>('doctors-all', async () => {
-  const { data } = await supabase.from('doctors').select('id, name, image, branch_id')
+  const { data } = await supabase
+    .from('doctors')
+    .select('id, name, image, branch_id')
+    // .eq('is_doctor', true)
   return (data as any) || []
 })
 
@@ -52,6 +68,7 @@ const getImageUrl = (path: string) => {
   const { data } = supabase.storage.from('images').getPublicUrl(path)
   return data.publicUrl
 }
+
 </script>
 
 <template>
@@ -60,36 +77,70 @@ const getImageUrl = (path: string) => {
     <section class="pt-32 pb-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       <div class="section-container text-center">
         <span class="text-secondary font-semibold tracking-wide uppercase text-sm">
-          Our Locations
+          আমাদের অবস্থান
         </span>
         <h1 class="heading-xl text-foreground mt-3 mb-6">
-          Hospital Branches
+          হাসপাতাল শাখাসমূহ
         </h1>
         <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Find an NSS Ma Shastho Seba Kendra location near you. Each of our branches offers 
-          comprehensive medical services with the same high standards of care.
+          আপনার নিকটস্থ এনএসএস মা স্বাস্থ্য সেবা কেন্দ্র খুঁজুন। আমাদের প্রতিটি শাখাই একই উচ্চ মানের সেবার সাথে ব্যাপক চিকিৎসা সেবা প্রদান করে।
         </p>
       </div>
     </section>
 
-    <!-- Branches List -->
+    <!-- Search Section -->
+    <section class="py-12 border-b border-border bg-card/50">
+      <div class="section-container max-w-2xl">
+        <div class="relative">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="শাখার নাম বা অবস্থান দ্বারা অনুসন্ধান করুন..."
+            class="w-full pl-12 pr-4 py-4 rounded-2xl border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-sm"
+          />
+          <svg
+            class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+      </div>
+    </section>
+
     <section class="section-padding">
       <div class="section-container">
-        <div class="space-y-12">
+        <div v-if="filteredBranches.length === 0" class="text-center py-20">
+          <MapPin class="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-20" />
+          <p class="text-muted-foreground text-lg">আপনার অনুসন্ধানের সাথে মিল রেখে কোনও শাখা পাওয়া যায়নি।</p>
+        </div>
+        <div v-else class="space-y-12">
           <div 
-            v-for="(branch, index) in branches"
-            :key="branch.id"
+            v-for="(branch, index) in filteredBranches"
+            :key="branch.address"
             class="flex flex-col lg:flex-row gap-8 items-stretch card-hover p-0 overflow-hidden"
             :class="{ 'lg:flex-row-reverse': index % 2 === 1 }"
           >
             <!-- Image -->
-            <div class="w-full lg:w-2/5">
+            <div class="w-full lg:w-2/5 relative group">
               <img
                 :src="getImageUrl(branch.image)"
                 :alt="branch.name"
                 loading="lazy"
-                class="w-full h-64 lg:h-full object-cover"
+                class="w-full h-64 lg:h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
+              <div class="absolute top-6 left-6 bg-primary text-primary-foreground px-4 py-2 rounded-full flex items-center gap-2 shadow-lg z-10">
+                <Users class="w-4 h-4" />
+                <span class="text-sm font-bold tracking-wide">{{ getDoctorCount(branch.address) }} ডাক্তার</span>
+              </div>
             </div>
 
             <!-- Content -->
@@ -115,7 +166,7 @@ const getImageUrl = (path: string) => {
                 </div>
                 <div class="flex items-center gap-3">
                   <Clock class="w-5 h-5 text-primary" />
-                  <span class="text-muted-foreground">Open 24/7</span>
+                  <span class="text-muted-foreground">২৪/৭ খোলা</span>
                 </div>
               </div>
 
@@ -124,13 +175,13 @@ const getImageUrl = (path: string) => {
                 <div class="flex items-center gap-2 mb-4">
                   <Users class="w-5 h-5 text-secondary" />
                   <span class="font-medium text-foreground">
-                    {{ getDoctorCount(branch.id) }} Doctors at this branch
+                    {{ getDoctorCount(branch.address) }} ডাক্তার এই শাখায় আছেন
                   </span>
                 </div>
                 
                 <div class="flex -space-x-3 mb-4">
                     <img
-                    v-for="doctor in getBranchDoctors(branch.id)"
+                    v-for="doctor in getBranchDoctors(branch.address)"
                     :key="doctor.id"
                     :src="getImageUrl(doctor.image)"
                     :alt="doctor.name"
@@ -138,18 +189,18 @@ const getImageUrl = (path: string) => {
                     class="w-12 h-12 rounded-full border-2 border-background object-cover"
                     :title="doctor.name"
                   />
-                  <div v-if="getDoctorCount(branch.id) > 3" class="w-12 h-12 rounded-full border-2 border-background bg-muted flex items-center justify-center text-sm font-medium text-muted-foreground">
-                    +{{ getDoctorCount(branch.id) - 3 }}
+                  <div v-if="getDoctorCount(branch.address) > 3" class="w-12 h-12 rounded-full border-2 border-background bg-muted flex items-center justify-center text-sm font-medium text-muted-foreground">
+                    +{{ getDoctorCount(branch.address) - 3 }}
                   </div>
                 </div>
               </div>
 
               <div class="flex flex-wrap gap-4">
                 <NuxtLink 
-                  :to="`/doctors?branch=${branch.id}`"
+                  :to="`/doctors?branch=${branch.address}`"
                   class="btn-primary inline-flex items-center gap-2"
                 >
-                  View Doctors
+                  ডাক্তারদের দেখুন
                   <ArrowRight class="w-4 h-4" />
                 </NuxtLink>
                 <a 
@@ -158,7 +209,7 @@ const getImageUrl = (path: string) => {
                   rel="noopener noreferrer"
                   class="btn-ghost"
                 >
-                  Get Directions
+                  দিকের নির্দেশনা পান
                 </a>
               </div>
             </div>
@@ -171,15 +222,15 @@ const getImageUrl = (path: string) => {
     <section class="section-padding bg-muted/50">
       <div class="section-container">
         <div class="text-center mb-12">
-          <h2 class="heading-lg text-foreground mb-4">Find Us on the Map</h2>
+          <h2 class="heading-lg text-foreground mb-4">মানচিত্রে আমাদের খুঁজুন</h2>
           <p class="text-muted-foreground text-lg">
-            All our branches are conveniently located for easy access.
+            আমাদের সমস্ত শাখা সহজ অ্যাক্সেসের জন্য সুবিধাজনকভাবে অবস্থিত।
           </p>
         </div>
         <div class="aspect-[16/9] max-h-[500px] rounded-2xl overflow-hidden bg-muted flex items-center justify-center">
           <div class="text-center">
             <MapPin class="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <p class="text-muted-foreground">Interactive Map Coming Soon</p>
+            <p class="text-muted-foreground">ইন্টারঅ্যাক্টিভ ম্যাপ শীঘ্রই আসছে</p>
           </div>
         </div>
       </div>

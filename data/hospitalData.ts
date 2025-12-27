@@ -30,6 +30,7 @@ export interface Doctor {
     bio: string;
     languages: string[];
     availableDays: string[];
+    isDoctor: boolean;
 }
 
 export interface Service {
@@ -95,6 +96,7 @@ export const doctors: Doctor[] = [
         bio: 'Dr. Anderson is a renowned cardiologist with over two decades of experience in treating complex heart conditions. He has pioneered several minimally invasive cardiac procedures.',
         languages: ['English', 'Spanish'],
         availableDays: ['Monday', 'Wednesday', 'Friday'],
+        isDoctor: true,
     },
     {
         id: 'dr-mitchell',
@@ -108,6 +110,7 @@ export const doctors: Doctor[] = [
         bio: 'Dr. Mitchell specializes in pediatric care with a focus on developmental health. She is passionate about creating a comfortable environment for children.',
         languages: ['English', 'French'],
         availableDays: ['Tuesday', 'Thursday', 'Saturday'],
+        isDoctor: true,
     },
     {
         id: 'dr-garcia',
@@ -121,6 +124,7 @@ export const doctors: Doctor[] = [
         bio: 'Dr. Garcia is an expert in neurological disorders, with special expertise in stroke prevention and treatment. He leads our neurology research division.',
         languages: ['English', 'Spanish', 'Portuguese'],
         availableDays: ['Monday', 'Tuesday', 'Thursday'],
+        isDoctor: true,
     },
     {
         id: 'dr-thompson',
@@ -134,6 +138,7 @@ export const doctors: Doctor[] = [
         bio: 'Dr. Thompson is a skilled orthopedic surgeon specializing in sports medicine and joint replacement. She has treated numerous professional athletes.',
         languages: ['English'],
         availableDays: ['Wednesday', 'Friday', 'Saturday'],
+        isDoctor: true,
     },
     {
         id: 'dr-chen',
@@ -147,6 +152,7 @@ export const doctors: Doctor[] = [
         bio: 'Dr. Chen is an expert in treating complex eye conditions and has performed over 5,000 successful eye surgeries including LASIK and cataract removal.',
         languages: ['English', 'Mandarin'],
         availableDays: ['Monday', 'Wednesday', 'Friday'],
+        isDoctor: true,
     },
     {
         id: 'dr-wilson',
@@ -160,6 +166,7 @@ export const doctors: Doctor[] = [
         bio: 'Dr. Wilson provides comprehensive primary care with a holistic approach to patient wellness. He believes in preventive medicine and patient education.',
         languages: ['English', 'German'],
         availableDays: ['Tuesday', 'Thursday', 'Saturday'],
+        isDoctor: true,
     },
 ];
 

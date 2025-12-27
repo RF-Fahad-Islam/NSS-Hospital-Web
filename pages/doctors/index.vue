@@ -21,9 +21,9 @@ interface Doctor {
 }
 
 useHead({
-  title: 'Our Team - NSS',
+  title: 'আমাদের টিম - এনএসএস',
   meta: [
-    { name: 'description', content: 'Meet our team of expert doctors and specialists.' }
+    { name: 'description', content: 'আমাদের বিশেষজ্ঞ ডাক্তার এবং বিশেষজ্ঞদের দলের সাথে পরিচিত হোন।' }
   ]
 })
 
@@ -31,14 +31,21 @@ const route = useRoute()
 const router = useRouter()
 const branchParam = route.query.branch as string
 const selectedBranch = ref<string>(branchParam || 'all')
+const searchQuery = ref('')
+
+interface Branch {
+  id: string
+  name: string
+  address: string
+}
 
 // Fetch branches for filter
-const { data: branches } = await useAsyncData('branches-list', async () => {
+const { data: branches } = await useAsyncData<Branch[]>('branches-list', async () => {
   const { data } = await supabase
     .from('branches')
     .select('*')
     .order('address', { ascending: true })
-  return data || []
+  return (data as Branch[]) || []
 })
 
 // Fetch doctors with branch details
@@ -51,13 +58,34 @@ const { data: doctors } = await useAsyncData<Doctor[]>('doctors-list', async () 
 
 
 const filteredDoctors = computed(() => {
-  const list = doctors.value || []
-  if (selectedBranch.value === 'all') return list
+  let list = doctors.value || []
   
   // Filter by branch address
-  return list.filter(doctor => {
-    return doctor.branches?.address === selectedBranch.value
-  })
+  if (selectedBranch.value !== 'all') {
+    list = list.filter(doctor => {
+      // 1. Check if the joined branch address matches
+      if (doctor.branches?.address === selectedBranch.value) return true
+      
+      // 2. Check if the param is actually an ID (backward compatibility)
+      if (doctor.branch_id === selectedBranch.value) return true
+
+      // 3. Fallback: Find the branch in our local branches list by ID, and compare addresses
+      // This handles cases where the DB Foreign Key join might impede fetching the address
+      const branch = (branches.value || []).find(b => b.id === doctor.branch_id)
+      return branch?.address === selectedBranch.value
+    })
+  }
+
+  // Filter by search query (name or specialty)
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim()
+    list = list.filter(doctor => 
+      doctor.name.toLowerCase().includes(query) || 
+      doctor.specialty.toLowerCase().includes(query)
+    )
+  }
+  
+  return list
 })
 
 const getBranchName = (branchId: string) => {
@@ -93,40 +121,68 @@ const getImageUrl = (path: string) => {
     <section class="pt-32 pb-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       <div class="section-container text-center">
         <span class="text-secondary font-semibold tracking-wide uppercase text-sm">
-          Our Medical Team
+          আমাদের মেডিকেল টিম
         </span>
         <h1 class="heading-xl text-foreground mt-3 mb-6">
-          Meet Our Medical Staff
+          আমাদের মেডিকেল স্টাফদের সাথে পরিচিত হোন
         </h1>
         <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Our team of highly qualified physicians brings decades of experience 
-          and genuine commitment to your well-being.
+          আমাদের উচ্চ যোগ্যতাসম্পন্ন চিকিৎসকদের দল দীর্ঘদিনের অভিজ্ঞতা এবং আপনার সুস্থতার প্রতি অকৃত্রিম প্রতিশ্রুতি নিয়ে সেবা প্রদান করেন।
         </p>
       </div>
     </section>
 
-    <!-- Filter Section -->
-    <section class="py-8 border-b border-border">
+    <!-- Filter & Search Section -->
+    <section class="py-8 bg-card border-b border-border sticky top-20 z-40 backdrop-blur-md bg-card/80">
       <div class="section-container">
-        <div class="flex flex-wrap items-center gap-4">
-          <span class="text-foreground font-medium">Filter by Branch:</span>
-          <div class="flex flex-wrap gap-2">
-            <button
-              @click="setBranch('all')"
-              class="px-4 py-2 rounded-full text-sm font-medium transition-all"
-              :class="selectedBranch === 'all' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'"
-            >
-              All Branches
-            </button>
-            <button
-              v-for="branch in branches"
-              :key="branch.id"
-              @click="setBranch(branch.address)"
-              class="px-4 py-2 rounded-full text-sm font-medium transition-all"
-              :class="selectedBranch === branch.address ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'"
-            >
-              {{ branch.address }}
-            </button>
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div class="flex flex-wrap items-center gap-4">
+            <span class="text-foreground font-medium whitespace-nowrap">শাখা অনুযায়ী ফিল্টার করুন:</span>
+            <div class="flex flex-wrap gap-2">
+              <button
+                @click="setBranch('all')"
+                class="px-4 py-2 rounded-full text-sm font-medium transition-all"
+                :class="selectedBranch === 'all' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'"
+              >
+                সকল শাখা
+              </button>
+              <button
+                v-for="branch in branches"
+                :key="branch.id"
+                @click="setBranch(branch.address)"
+                class="px-4 py-2 rounded-full text-sm font-medium transition-all"
+                :class="selectedBranch === branch.address ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'"
+              >
+                {{ branch.address }}
+              </button>
+            </div>
+          </div>
+
+          <div class="relative w-full lg:w-80">
+            <ClientOnly>
+              <div class="relative">
+                <input
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="ডাক্তার বা বিশেষত্ব অনুসন্ধান করুন..."
+                  class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm"
+                />
+                <svg
+                  class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+            </ClientOnly>
           </div>
         </div>
       </div>
@@ -134,59 +190,66 @@ const getImageUrl = (path: string) => {
 
     <section class="section-padding">
       <div class="section-container">
-        <div v-if="filteredDoctors.length === 0" class="text-center py-16">
-          <p class="text-muted-foreground text-lg">No doctors found for this branch.</p>
-        </div>
-        <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div v-for="doctor in filteredDoctors" :key="doctor.id" class="doctor-card group">
-            <!-- Image Container -->
-            <div class="relative overflow-hidden aspect-[4/5]">
-              <img
-                :src="getImageUrl(doctor.image)"
-                :alt="doctor.name"
-                loading="lazy"
-                class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
-
-            <!-- Info -->
-            <div class="p-6">
-              <div class="flex items-center gap-1 mb-3">
-                <Star class="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span class="text-sm font-medium text-foreground">{{ doctor.rating }}</span>
-                <span class="text-sm text-muted-foreground">• {{ doctor.experience }}</span>
-              </div>
-              
-              <h3 class="text-xl font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
-                {{ doctor.name }}
-              </h3>
-              <p class="text-secondary font-medium mb-3">{{ doctor.specialty }}</p>
-              
-              <div class="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                <MapPin class="w-4 h-4" />
-                <span>{{ doctor.branches?.address || getBranchName(doctor.branch_id) }}</span>
+        <ClientOnly>
+          <div v-if="filteredDoctors.length === 0" class="text-center py-16">
+            <p class="text-muted-foreground text-lg">আপনার মানদণ্ডের সাথে মিলে এমন কোনও ডাক্তার পাওয়া যায়নি।</p>
+          </div>
+          <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div v-for="doctor in filteredDoctors" :key="doctor.id" class="doctor-card group">
+              <!-- Image Container -->
+              <div class="relative overflow-hidden aspect-[4/5]">
+                <img
+                  :src="getImageUrl(doctor.image)"
+                  :alt="doctor.name"
+                  loading="lazy"
+                  class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
 
-              <div class="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                <Calendar class="w-4 h-4" />
-                <span>{{ doctor.available_days ? doctor.available_days.join(', ') : '' }}</span>
+              <!-- Info -->
+              <div class="p-6">
+                <div class="flex items-center gap-1 mb-3">
+                  <Star class="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <span class="text-sm font-medium text-foreground">{{ doctor.rating }}</span>
+                  <span class="text-sm text-muted-foreground">• {{ doctor.experience }}</span>
+                </div>
+                
+                <h3 class="text-xl font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
+                  {{ doctor.name }}
+                </h3>
+                <p class="text-secondary font-medium mb-3">{{ doctor.specialty }}</p>
+                
+                <div class="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+                  <MapPin class="w-4 h-4" />
+                  <span>{{ doctor.branches?.address || getBranchName(doctor.branch_id) }}</span>
+                </div>
+
+                <div class="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+                  <Calendar class="w-4 h-4" />
+                  <span>{{ doctor.available_days ? doctor.available_days.join(', ') : '' }}</span>
+                </div>
+
+                <p class="text-muted-foreground text-sm mb-4 line-clamp-2">
+                  {{ doctor.bio }}
+                </p>
+
+                <NuxtLink 
+                  :to="`/doctors/${doctor.id}`"
+                  class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all"
+                >
+                  সম্পূর্ণ প্রোফাইল দেখুন
+                  <ArrowRight class="w-4 h-4" />
+                </NuxtLink>
               </div>
-
-              <p class="text-muted-foreground text-sm mb-4 line-clamp-2">
-                {{ doctor.bio }}
-              </p>
-
-              <NuxtLink 
-                :to="`/doctors/${doctor.id}`"
-                class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all"
-              >
-                View Full Profile
-                <ArrowRight class="w-4 h-4" />
-              </NuxtLink>
             </div>
           </div>
-        </div>
+          <template #fallback>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div v-for="i in 6" :key="i" class="h-[400px] bg-muted/20 animate-pulse rounded-2xl"></div>
+            </div>
+          </template>
+        </ClientOnly>
       </div>
     </section>
 
@@ -194,13 +257,13 @@ const getImageUrl = (path: string) => {
     <section class="section-padding bg-muted/50">
       <div class="section-container text-center">
         <h2 class="heading-lg text-foreground mb-4">
-          Ready to Book an Appointment?
+          অ্যাপয়েন্টমেন্ট নিতে প্রস্তুত?
         </h2>
         <p class="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
-          Schedule a consultation with any of our expert physicians today.
+          আজই আমাদের বিশেষজ্ঞ চিকিৎসকদের সাথে পরামর্শের সময়সূচী করুন।
         </p>
         <NuxtLink to="/#appointment" class="btn-primary">
-          Book Appointment
+          অ্যাপয়েন্টমেন্ট নিন
         </NuxtLink>
       </div>
     </section>

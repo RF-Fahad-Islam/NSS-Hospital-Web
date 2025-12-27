@@ -1,6 +1,13 @@
 <script setup lang="ts">
 const nuxtApp = useNuxtApp()
+const route = useRoute()
+const { trackVisit } = useAnalytics()
 const loading = ref(true)
+
+// Track visits on route change
+watch(() => route.path, (path) => {
+  trackVisit(path)
+}, { immediate: true })
 
 nuxtApp.hook('page:start', () => {
   loading.value = true
@@ -25,5 +32,7 @@ onMounted(() => {
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    <AIChatbot />
+    <UiToaster />
   </div>
 </template>

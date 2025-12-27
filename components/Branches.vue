@@ -20,21 +20,28 @@ const { data: branches } = await useAsyncData<Branch[]>('branches-home', async (
   return (data as Branch[]) || []
 })
 
-// Fetch doctor counts per branch
-const { data: doctorCounts } = await useAsyncData('branch-doctor-counts', async () => {
-  const { data } = await supabase.from('doctors').select('branch_id')
-  
-  const counts: Record<string, number> = {}
-  if (data) {
-    data.forEach((d: any) => {
-      counts[d.branch_id] = (counts[d.branch_id] || 0) + 1
-    })
-  }
-  return counts
+// Fetch all doctors for counts and images
+const { data: doctors } = await useAsyncData('doctors-home', async () => {
+  const { data } = await supabase
+    .from('doctors')
+    .select('id, name, image, branch_id')
+    // .eq('is_doctor', true) // Temporarily disabled for debugging
+  return (data as any[]) || []
 })
 
 const getDoctorCount = (branchId: string) => {
-  return doctorCounts.value?.[branchId] || 0
+  return (doctors.value || []).filter((d) => d.branch_id === branchId).length
+}
+
+const getBranchDoctors = (branchId: string) => {
+  return (doctors.value || []).filter((d) => d.branch_id === branchId).slice(0, 3)
+}
+
+const getImageUrl = (path: string) => {
+  if (!path) return ''
+  if (path.startsWith('http')) return path
+  const { data } = supabase.storage.from('images').getPublicUrl(path)
+  return data.publicUrl
 }
 </script>
 
@@ -42,16 +49,16 @@ const getDoctorCount = (branchId: string) => {
   <section id="branches" class="section-padding bg-muted/30">
     <div class="section-container">
       <!-- Section Header -->
+      <!-- Section Header -->
       <div class="text-center max-w-2xl mx-auto mb-16">
         <span class="text-secondary font-semibold tracking-wide uppercase text-sm">
-          Our Locations
+          আমাদের অবস্থান
         </span>
         <h2 class="heading-lg text-foreground mt-3 mb-4">
-          Hospital Branches
+          হাসপাতাল শাখাসমূহ
         </h2>
         <p class="text-muted-foreground text-lg">
-          Find a MediCarePlus branch near you. Quality healthcare 
-          available at multiple convenient locations.
+          আপনার নিকটস্থ এনএসএস মা স্বাস্থ্য সেবা কেন্দ্র শাখা খুঁজুন। সুবিধাজনক একাধিক স্থানে মানসম্মত স্বাস্থ্যসেবা উপলব্ধ।
         </p>
       </div>
 
@@ -71,6 +78,13 @@ const getDoctorCount = (branchId: string) => {
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
+            
+            <!-- Doctor Count Badge -->
+            <div class="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm z-10">
+              <Users class="w-3.5 h-3.5 text-primary" />
+              <span class="text-xs font-bold text-foreground uppercase tracking-wide">{{ getDoctorCount(branch.id) }} ডাক্তার</span>
+            </div>
+
             <div class="absolute bottom-4 left-4 right-4">
               <h3 class="text-xl font-semibold text-primary-foreground">
                 {{ branch.name }}
@@ -94,19 +108,14 @@ const getDoctorCount = (branchId: string) => {
                   {{ branch.phone }}
                 </a>
               </div>
-              <div class="flex items-center gap-3">
-                <Users class="w-5 h-5 text-secondary" />
-                <span class="text-muted-foreground text-sm">
-                  {{ getDoctorCount(branch.id) }} Expert Doctors
-                </span>
-              </div>
+              <!-- Doctor count section removed -->
             </div>
 
             <NuxtLink 
-              :to="`/doctors?branch=${branch.id}`"
+              :to="`/doctors?branch=${branch.address}`"
               class="inline-flex items-center gap-2 text-primary font-medium text-sm group-hover:gap-3 transition-all"
             >
-              View Doctors at This Branch
+              এই শাখার ডাক্তারদের দেখুন
               <ArrowRight class="w-4 h-4" />
             </NuxtLink>
           </div>
@@ -116,7 +125,7 @@ const getDoctorCount = (branchId: string) => {
       <!-- CTA -->
       <div class="text-center mt-12">
         <NuxtLink to="/branches" class="btn-primary">
-          View All Branches
+          সকল শাখা দেখুন
         </NuxtLink>
       </div>
     </div>

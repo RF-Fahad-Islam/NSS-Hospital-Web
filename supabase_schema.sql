@@ -90,6 +90,98 @@ create policy "Public services are viewable by everyone" on services for select 
 create policy "Public branches are viewable by everyone" on branches for select using (true);
 create policy "Public gallery items are viewable by everyone" on gallery_items for select using (true);
 
+-- Admin CRUD Policies for Doctors
+create policy "Admins can insert doctors" on doctors for insert with check (
+  exists (
+    select 1 from user_roles
+    where user_roles.user_id = auth.uid()
+    and user_roles.role = 'admin'
+  )
+);
+create policy "Admins can update doctors" on doctors for update using (
+  exists (
+    select 1 from user_roles
+    where user_roles.user_id = auth.uid()
+    and user_roles.role = 'admin'
+  )
+);
+create policy "Admins can delete doctors" on doctors for delete using (
+  exists (
+    select 1 from user_roles
+    where user_roles.user_id = auth.uid()
+    and user_roles.role = 'admin'
+  )
+);
+
+-- Admin CRUD Policies for Services
+create policy "Admins can insert services" on services for insert with check (
+  exists (
+    select 1 from user_roles
+    where user_roles.user_id = auth.uid()
+    and user_roles.role = 'admin'
+  )
+);
+create policy "Admins can update services" on services for update using (
+  exists (
+    select 1 from user_roles
+    where user_roles.user_id = auth.uid()
+    and user_roles.role = 'admin'
+  )
+);
+create policy "Admins can delete services" on services for delete using (
+  exists (
+    select 1 from user_roles
+    where user_roles.user_id = auth.uid()
+    and user_roles.role = 'admin'
+  )
+);
+
+-- Admin CRUD Policies for Branches
+create policy "Admins can insert branches" on branches for insert with check (
+  exists (
+    select 1 from user_roles
+    where user_roles.user_id = auth.uid()
+    and user_roles.role = 'admin'
+  )
+);
+create policy "Admins can update branches" on branches for update using (
+  exists (
+    select 1 from user_roles
+    where user_roles.user_id = auth.uid()
+    and user_roles.role = 'admin'
+  )
+);
+create policy "Admins can delete branches" on branches for delete using (
+  exists (
+    select 1 from user_roles
+    where user_roles.user_id = auth.uid()
+    and user_roles.role = 'admin'
+  )
+);
+
+-- Admin CRUD Policies for Gallery Items
+create policy "Admins can insert gallery items" on gallery_items for insert with check (
+  exists (
+    select 1 from user_roles
+    where user_roles.user_id = auth.uid()
+    and user_roles.role = 'admin'
+  )
+);
+create policy "Admins can update gallery items" on gallery_items for update using (
+  exists (
+    select 1 from user_roles
+    where user_roles.user_id = auth.uid()
+    and user_roles.role = 'admin'
+  )
+);
+create policy "Admins can delete gallery items" on gallery_items for delete using (
+  exists (
+    select 1 from user_roles
+    where user_roles.user_id = auth.uid()
+    and user_roles.role = 'admin'
+  )
+);
+
 -- Create Policies (Appointments: Public Insert, Admin Read/Update)
 create policy "Anyone can insert appointments" on appointments for insert with check (true);
 create policy "Admins can view all appointments" on appointments for select using (
@@ -107,13 +199,10 @@ create policy "Admins can update appointments" on appointments for update using 
   )
 );
 
--- Create Policies (User Roles: Admin Read Only)
-create policy "Admins can view user roles" on user_roles for select using (
-  exists (
-    select 1 from user_roles
-    where user_roles.user_id = auth.uid()
-    and user_roles.role = 'admin'
-  )
+-- Create Policies (User Roles: Users can view their own roles)
+-- This avoids infinite recursion by not querying user_roles within a user_roles policy
+create policy "Users can view their own roles" on user_roles for select using (
+  user_id = auth.uid()
 );
 
 -- STORAGE BUCKET SETUP
@@ -132,6 +221,28 @@ create policy "Public Access"
 create policy "Admin Upload"
   on storage.objects for insert
   with check (
+    bucket_id = 'images' 
+    and exists (
+      select 1 from user_roles
+      where user_roles.user_id = auth.uid()
+      and user_roles.role = 'admin'
+    )
+  );
+
+create policy "Admin Update"
+  on storage.objects for update
+  using (
+    bucket_id = 'images' 
+    and exists (
+      select 1 from user_roles
+      where user_roles.user_id = auth.uid()
+      and user_roles.role = 'admin'
+    )
+  );
+
+create policy "Admin Delete"
+  on storage.objects for delete
+  using (
     bucket_id = 'images' 
     and exists (
       select 1 from user_roles

@@ -12,23 +12,23 @@ const { data: doctorCount } = await useAsyncData('stats-doctor-count', async () 
 const stats = computed(() => [
   {
     icon: Clock,
-    value: '24/7',
-    label: 'Emergency Support',
+    value: '২৪/৭',
+    label: 'জরুরী সেবা',
   },
   {
     icon: Users,
-    value: doctorCount.value ? `${doctorCount.value}+` : '0+',
-    label: 'Doctors & Staff',
+    value: doctorCount.value ? `${doctorCount.value}+` : '০+',
+    label: 'ডাক্তার ও স্টাফ',
   },
   {
     icon: FlaskConical,
-    value: 'Modern',
-    label: 'Laboratory',
+    value: 'আধুনিক',
+    label: 'ল্যাবরেটরি',
   },
   {
     icon: Award,
-    value: '35+',
-    label: 'Years Experience',
+    value: '৩৫+',
+    label: 'বছরের অভিজ্ঞতা',
   },
 ])
 </script>

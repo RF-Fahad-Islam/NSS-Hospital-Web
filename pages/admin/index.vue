@@ -18,6 +18,7 @@ const fullName = ref('')
 const loading = ref(false)
 const error = ref('')
 const signupSuccess = ref(false)
+const submittedEmail = ref('')
 
 onMounted(async () => {
   const { data: { session } } = await supabase.auth.getSession()
@@ -29,7 +30,7 @@ onMounted(async () => {
       .eq('role', 'admin')
       .maybeSingle()
     
-    if (roleData) {
+    if (roleData || import.meta.dev || import.meta.env.MODE === 'development') {
       router.push('/admin/dashboard')
     }
   }
@@ -63,13 +64,21 @@ const handleLogin = async () => {
         .maybeSingle()
 
       if (roleError || !roleData) {
-        await supabase.auth.signOut()
-        error.value = 'Access denied. Your admin access is pending approval.'
-        return
+        // Allow dev bypass
+        if (import.meta.dev || import.meta.env.MODE === 'development') {
+          console.warn('Dev mode: Bypassing admin role check')
+        } else {
+          await supabase.auth.signOut()
+          error.value = 'Access denied. Your admin access is pending approval.'
+          return
+        }
       }
 
-      // Toast or alert
-      // alert("Welcome back! Successfully logged in as admin.")
+      toast({
+        title: "Welcome back!",
+        description: "Successfully logged in as admin.",
+        variant: "success",
+      })
       router.push('/admin/dashboard')
     }
   } catch (err) {
@@ -111,6 +120,7 @@ const handleSignup = async () => {
     }
 
     if (data.user) {
+      submittedEmail.value = email.value
       signupSuccess.value = true
       email.value = ''
       password.value = ''
@@ -135,19 +145,21 @@ const toggleMode = () => {
   resetForm()
   isLogin.value = !isLogin.value
 }
+
+const { toast } = useToast()
 </script>
 
 <template>
     <div v-if="signupSuccess" class="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center justify-center p-4">
       <div class="w-full max-w-md">
         <div class="bg-card rounded-2xl shadow-medical-lg p-8 text-center">
-          <div class="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-4">
-            <CheckCircle class="w-8 h-8 text-secondary" />
+          <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <Mail class="w-8 h-8 text-primary" />
           </div>
-          <h1 class="heading-md text-foreground mb-2">Registration Successful!</h1>
+          <h1 class="heading-md text-foreground mb-2">Verify with email</h1>
           <p class="text-muted-foreground mb-6">
-            Your account has been created. Please wait for an administrator to approve your access. 
-            You will be notified once your admin privileges are granted.
+            We've sent a verification link to <span class="font-medium text-foreground">{{ submittedEmail }}</span>.
+            Please check your inbox to verify your account.
           </p>
           <button
             @click="signupSuccess = false; isLogin = true"

@@ -16,11 +16,11 @@ onMounted(() => {
 })
 
 const navLinks = [
-  { name: 'About', href: '/#about', isAnchor: true },
-  { name: 'Services', href: '/services', isAnchor: false },
-  { name: 'Doctors & Staff', href: '/doctors', isAnchor: false },
-  { name: 'Branches', href: '/branches', isAnchor: false },
-  { name: 'Gallery', href: '/gallery', isAnchor: false },
+  { name: 'আমাদের সম্পর্কে', href: '/about-us', isAnchor: false },
+  { name: 'সেবাসমূহ', href: '/services', isAnchor: false },
+  { name: 'ডাক্তার ও স্টাফ', href: '/doctors', isAnchor: false },
+  { name: 'শাখাসমূহ', href: '/branches', isAnchor: false },
+  { name: 'গ্যালারি', href: '/gallery', isAnchor: false },
 ]
 
 // Adjust href based on page if needed, but in Nuxt /#id usually works well globally
@@ -58,10 +58,10 @@ const navLinks = [
         <div class="hidden lg:flex items-center gap-4">
           <a href="tel:+1234567890" class="btn-ghost gap-2">
             <Phone class="w-4 h-4" />
-            <span>Emergency</span>
+            <span>জরুরী সেবা</span>
           </a>
           <a href="#appointment" class="btn-primary">
-            Book Appointment
+            অ্যাপয়েন্টমেন্ট নিন
           </a>
         </div>
 
@@ -92,10 +92,10 @@ const navLinks = [
           <div class="pt-4 mt-2 border-t border-border flex flex-col gap-3 px-4">
             <a href="tel:+1234567890" class="btn-ghost justify-center gap-2">
               <Phone class="w-4 h-4" />
-              <span>Emergency Call</span>
+              <span>জরুরী কল</span>
             </a>
             <a href="#appointment" class="btn-primary justify-center">
-              Book Appointment
+              অ্যাপয়েন্টমেন্ট নিন
             </a>
           </div>
         </nav>

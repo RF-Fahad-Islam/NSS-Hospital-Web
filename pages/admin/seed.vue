@@ -93,7 +93,8 @@ const seedDatabase = async () => {
         education: d.education,
         bio: d.bio,
         languages: d.languages,
-        available_days: d.availableDays
+        available_days: d.availableDays,
+        is_doctor: d.isDoctor
       })))
 
     if (doctorError) throw doctorError

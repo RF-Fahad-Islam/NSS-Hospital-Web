@@ -79,14 +79,13 @@ const getServiceColors = (service: any) => {
       <!-- Section Header -->
       <div class="text-center max-w-2xl mx-auto mb-16">
         <span class="text-secondary font-semibold tracking-wide uppercase text-sm">
-          Our Specialties
+          আমাদের বিশেষত্ব
         </span>
         <h2 class="heading-lg text-foreground mt-3 mb-4">
-          Comprehensive Medical Services
+          ব্যাপক চিকিৎসা সেবা
         </h2>
         <p class="text-muted-foreground text-lg">
-          We offer a wide range of medical services to meet all your healthcare needs 
-          under one roof with the latest technology and expert care.
+          আমরা অত্যাধুনিক প্রযুক্তি এবং বিশেষজ্ঞ সেবার মাধ্যমে একই ছাদের নিচে আপনার সমস্ত স্বাস্থ্যসেবা নিশ্চিত করি।
         </p>
       </div>
 
@@ -123,23 +122,23 @@ const getServiceColors = (service: any) => {
             class="h-auto"
           >
             <div 
-              class="service-card group cursor-pointer h-full"
+              class="service-card group cursor-pointer h-full min-h-[320px] p-8 flex flex-col"
             >
               <div 
-                class="w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 mb-5 group-hover:bg-primary group-hover:text-primary-foreground"
+                class="w-16 h-16 rounded-xl flex items-center justify-center transition-all duration-300 mb-6 group-hover:bg-primary group-hover:text-primary-foreground flex-shrink-0"
                 :class="[
                   getServiceColors(service).bg,
                   getServiceColors(service).color
                 ]"
               >
-                <component :is="getIcon(service.icon_name)" class="w-7 h-7" />
+                <component :is="getIcon(service.icon_name)" class="w-8 h-8" />
               </div>
               
               <h3 class="heading-sm text-foreground mb-3 group-hover:text-primary transition-colors">
                 {{ service.title }}
               </h3>
               
-              <p class="text-muted-foreground mb-4 leading-relaxed line-clamp-3">
+              <p class="text-muted-foreground mb-6 leading-relaxed line-clamp-4 flex-grow">
                 {{ service.description }}
               </p>
 
@@ -162,7 +161,7 @@ const getServiceColors = (service: any) => {
       <!-- CTA -->
       <div class="text-center mt-8">
         <NuxtLink to="/services" class="btn-primary">
-          View All Services
+          সকল সেবা দেখুন
         </NuxtLink>
       </div>
     </div>

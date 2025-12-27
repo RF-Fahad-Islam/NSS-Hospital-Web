@@ -3,8 +3,8 @@ import { ArrowRight, Phone } from 'lucide-vue-next'
 import heroImage from '@/assets/hero-medical.jpg'
 
 const stats = [
-  { icon: '🏆', value: '15,000+', label: 'Successful Surgeries' },
-  { icon: '⭐', value: '4.9/5', label: 'Patient Satisfaction' }
+  { icon: '🏆', value: '১৫,০০০+', label: 'সফল অস্ত্রোপচার' },
+  { icon: '⭐', value: '৪.৯/৫', label: 'রোগীর সন্তুষ্টি' }
 ]
 </script>
 
@@ -24,30 +24,29 @@ const stats = [
           <div class="animate-fade-up opacity-0">
             <span class="inline-flex items-center gap-2 px-4 py-2 bg-primary-foreground/10 backdrop-blur-sm rounded-full text-primary-foreground/90 text-sm font-medium mb-6">
               <span class="w-2 h-2 bg-secondary rounded-full animate-pulse-soft" />
-              Trusted Healthcare Since 1985
+              ১৯৮৫ সাল থেকে বিশ্বস্ত স্বাস্থ্যসেবা
             </span>
           </div>
 
           <h1 class="heading-xl text-primary-foreground mb-6 animate-fade-up opacity-0 stagger-1 text-balance">
-            <span class="block text-5xl md:text-7xl font-extrabold tracking-tight mb-2">NSS</span>
-            <span class="block text-3xl md:text-5xl font-bold tracking-tight mb-4">Ma Shastho Seba Kendra</span>
-            <span class="text-secondary-foreground/90 text-2xl md:text-3xl font-medium block">People Participation for Social Change</span>
+            <span class="block text-5xl md:text-7xl font-extrabold tracking-tight mb-2">এনএসএস</span>
+            <span class="block text-3xl md:text-5xl font-bold tracking-tight mb-4">মা স্বাস্থ্য সেবা কেন্দ্র</span>
+            <span class="text-secondary-foreground/90 text-2xl md:text-3xl font-medium block">সামাজিক পরিবর্তনের জন্য জনগণের অংশগ্রহণ</span>
           </h1>
 
           <p class="text-lg md:text-xl text-primary-foreground/80 mb-10 max-w-xl animate-fade-up opacity-0 stagger-2 text-balance">
-            Experience world-class healthcare with our team of expert physicians. 
-            We combine cutting-edge technology with personalized care to help you 
-            live your healthiest life.
+            আমাদের বিশেষজ্ঞ চিকিৎসকদের তত্ত্বাবধানে বিশ্বমানের স্বাস্থ্যসেবার অভিজ্ঞতা নিন। 
+            আমরা আপনাকে সুস্থ জীবন যাপনে সহায়তা করতে আধুনিক প্রযুক্তি এবং ব্যক্তিগত যত্ন প্রদান করি।
           </p>
 
           <div class="flex flex-col sm:flex-row gap-4 animate-fade-up opacity-0 stagger-3">
             <a href="#services" class="btn-secondary gap-2 group">
-              Our Services
+              আমাদের সেবাসমূহ
               <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </a>
-            <a href="tel:+1234567890" class="btn-outline gap-2">
+            <a href="tel:+880445256054" class="btn-outline gap-2">
               <Phone class="w-4 h-4" />
-              Emergency: 1-800-MEDICARE
+              জরুরী: +৮৮ ০৪৪৫২ ৫৬০৫৪
             </a>
           </div>
         </div>
@@ -60,8 +59,8 @@ const stats = [
                   <span class="text-2xl">🏆</span>
                </div>
                <div>
-                  <p class="text-2xl font-bold text-foreground">15,000+</p>
-                  <p class="text-sm text-muted-foreground">Successful Surgeries</p>
+                  <p class="text-2xl font-bold text-foreground">১৫,০০০+</p>
+                  <p class="text-sm text-muted-foreground">সফল অস্ত্রোপচার</p>
                </div>
             </div>
             <div class="flex items-center gap-4">
@@ -69,8 +68,8 @@ const stats = [
                   <span class="text-2xl">⭐</span>
                </div>
                <div>
-                  <p class="text-2xl font-bold text-foreground">4.9/5</p>
-                  <p class="text-sm text-muted-foreground">Patient Satisfaction</p>
+                  <p class="text-2xl font-bold text-foreground">৪.৯/৫</p>
+                  <p class="text-sm text-muted-foreground">রোগীর সন্তুষ্টি</p>
                </div>
             </div>
           </div>

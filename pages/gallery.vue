@@ -5,9 +5,9 @@ import { X } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
 useHead({
-  title: 'Gallery - NSS Ma Shastho Seba Kendra',
+  title: 'গ্যালারি - এনএসএস মা স্বাস্থ্য সেবা কেন্দ্র',
   meta: [
-    { name: 'description', content: 'Virtual tour of our facilities.' }
+    { name: 'description', content: 'আমাদের সুবিধার ভার্চুয়াল ট্যুর।' }
   ]
 })
 
@@ -60,14 +60,13 @@ const getImageUrl = (path: string) => {
     <section class="pt-32 pb-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       <div class="section-container text-center">
         <span class="text-secondary font-semibold tracking-wide uppercase text-sm">
-          Our Facilities
+          আমাদের সুবিধাসমূহ
         </span>
         <h1 class="heading-xl text-foreground mt-3 mb-6">
-          Hospital Gallery
+          হাসপাতাল গ্যালারি
         </h1>
         <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Take a virtual tour of our state-of-the-art medical facilities, 
-          modern equipment, and comfortable patient areas.
+          আমাদের অত্যাধুনিক চিকিৎসা সুবিধা, আধুনিক সরঞ্জাম এবং আরামদায়ক রোগীর এলাকার একটি ভার্চুয়াল ট্যুর নিন।
         </p>
       </div>
     </section>
@@ -77,7 +76,15 @@ const getImageUrl = (path: string) => {
       <div class="section-container">
         <div class="flex flex-wrap justify-center gap-3">
           <button
+            @click="activeCategory = 'All'"
+            class="px-6 py-2.5 rounded-full text-sm font-medium transition-all"
+            :class="activeCategory === 'All' ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground hover:bg-muted/80'"
+          >
+            সব
+          </button>
+          <button
             v-for="category in categories"
+            v-show="category !== 'All'"
             :key="category"
             @click="activeCategory = category"
             class="px-6 py-2.5 rounded-full text-sm font-medium transition-all"
@@ -150,13 +157,13 @@ const getImageUrl = (path: string) => {
     <section class="section-padding bg-primary">
       <div class="section-container text-center">
         <h2 class="heading-lg text-primary-foreground mb-4">
-          Experience Our Facilities In Person
+          সরাসরি আমাদের সুবিধাগুলো অভিজ্ঞতা নিন
         </h2>
         <p class="text-primary-foreground/80 text-lg mb-8 max-w-2xl mx-auto">
-          Schedule a tour of our hospital to see our world-class facilities firsthand.
+          বিশ্বমানের সুযোগ-সুবিধাগুলি সরাসরি দেখতে আমাদের হাসপাতালে একটি ট্যুরের সময়সূচী করুন।
         </p>
         <a href="tel:+1234567890" class="btn-outline">
-          Schedule a Tour
+          ট্যুরের সময়সূচী করুন
         </a>
       </div>
     </section>
