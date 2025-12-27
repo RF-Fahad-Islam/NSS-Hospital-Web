@@ -132,7 +132,6 @@ const getImageUrl = (path: string) => {
       </div>
     </section>
 
-    <!-- Doctors Grid -->
     <section class="section-padding">
       <div class="section-container">
         <div v-if="filteredDoctors.length === 0" class="text-center py-16">
