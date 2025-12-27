@@ -269,7 +269,7 @@ async function fetchData() {
     const { data: doctorsData } = await supabase
       .from('doctors')
       .select('*')
-      .order('name')
+      .order('sequence', { ascending: true, nullsFirst: false })
     
     if (doctorsData) doctors.value = doctorsData
 
@@ -285,7 +285,7 @@ async function fetchData() {
     const { data: branchesData } = await supabase
       .from('branches')
       .select('*')
-      .order('name')
+      .order('sequence', { ascending: true, nullsFirst: false })
     
     if (branchesData) branches.value = branchesData
   } catch (error) {

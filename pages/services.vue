@@ -171,23 +171,8 @@ const getDoctorsForService = (service: Service) => {
             <div class="w-full lg:w-2/3">
               <div class="flex items-start justify-between mb-4">
                 <h2 class="heading-lg text-foreground">{{ service.title }}</h2>
-                
-                <!-- Doctor Badges -->
-                <div v-if="getDoctorsForService(service).length > 0" class="flex items-center gap-3 bg-card px-3 py-1.5 rounded-full border border-border shadow-sm">
-                  <div class="flex -space-x-2">
-                     <img 
-                       v-for="doctor in getDoctorsForService(service).slice(0, 3)" 
-                       :key="doctor.id"
-                       :src="getImageUrl(doctor.image)"
-                       :alt="doctor.name"
-                       class="w-8 h-8 rounded-full border-2 border-background object-cover"
-                     />
-                  </div>
-                  <div class="text-xs font-medium text-muted-foreground pr-1">
-                    <span class="text-primary font-bold">{{ getDoctorsForService(service).length }}</span> বিশেষজ্ঞ ডাক্তার
-                  </div>
-                </div>
               </div>
+
 
               <p class="text-muted-foreground text-lg mb-6 leading-relaxed">
                 {{ service.full_description }}

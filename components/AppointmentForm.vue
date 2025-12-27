@@ -26,7 +26,7 @@ onMounted(async () => {
     const { data, error } = await supabase
       .from('branches')
       .select('address')
-      .order('address')
+      .order('sequence', { ascending: true, nullsFirst: false })
     
     if (error) throw error
     

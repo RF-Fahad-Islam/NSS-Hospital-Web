@@ -32,7 +32,7 @@ interface Doctor {
 
 // Fetch branches
 const { data: rawBranches } = await useAsyncData<Branch[]>('branches-page', async () => {
-  const { data } = await supabase.from('branches').select('*')
+  const { data } = await supabase.from('branches').select('*').order('sequence', { ascending: true, nullsFirst: false })
   return (data as any) || []
 })
 
@@ -52,6 +52,7 @@ const { data: doctors } = await useAsyncData<Doctor[]>('doctors-all', async () =
   const { data } = await supabase
     .from('doctors')
     .select('id, name, image, branch_id, role')
+    .order('sequence', { ascending: true, nullsFirst: false })
   return (data as any) || []
 })
 
@@ -72,6 +73,12 @@ const getImageUrl = (path: string) => {
   if (path.startsWith('http')) return path
   const { data } = supabase.storage.from('images').getPublicUrl(path)
   return data.publicUrl
+}
+
+const getManagerImageUrl = (branchAddress: string) => {
+  const manager = getManager(branchAddress)
+  if (!manager?.image) return ''
+  return getImageUrl(manager.image)
 }
 
 </script>
@@ -150,8 +157,9 @@ const getImageUrl = (path: string) => {
               <!-- Manager Badge -->
               <div v-if="getManager(branch.address)" class="absolute bottom-6 right-6 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 flex items-center gap-2 shadow-lg z-10 border border-primary/20">
                 <img 
-                  :src="getManager(branch.address)?.image || '/images/placeholder-doctor.jpg'" 
-                  :alt="getManager(branch.address)?.name"
+                  v-if="getManagerImageUrl(branch.address)"
+                  :src="getManagerImageUrl(branch.address)"
+                  :alt="getManager(branch.address)?.name || 'Manager'"
                   class="w-8 h-8 rounded-full object-cover border-2 border-primary"
                 />
                 <div class="text-left">
@@ -182,15 +190,29 @@ const getImageUrl = (path: string) => {
                     {{ branch.email }}
                   </a>
                 </div>
-                 <div v-if="branch.manager_name" class="flex items-center gap-3">
-                  <UserCheck class="w-5 h-5 text-primary" />
-                  <span class="text-muted-foreground">Manager: {{ branch.manager_name }}</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <Clock class="w-5 h-5 text-primary" />
-                  <span class="text-muted-foreground">২৪/৭ খোলা</span>
-                </div>
-              </div>
+                 <template v-if="getManager(branch.address)">
+                   <div class="flex items-center gap-3">
+                    <UserCheck class="w-5 h-5 text-primary" />
+                    <div class="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5 border border-border/50">
+                      <img 
+                        v-if="getManagerImageUrl(branch.address)"
+                        :src="getManagerImageUrl(branch.address)"
+                        :alt="getManager(branch.address)?.name || 'Manager'"
+                        class="w-6 h-6 rounded-full object-cover border border-primary/30"
+                      />
+                      <div class="flex flex-col">
+                        <span class="text-[10px] text-muted-foreground uppercase tracking-wide leading-none">Manager</span>
+                        <span class="text-sm font-medium text-foreground leading-tight">{{ getManager(branch.address)?.name }}</span>
+                      </div>
+                    </div>
+                   </div>
+                 </template>
+                 <div class="flex items-center gap-3">
+                   <Clock class="w-5 h-5 text-primary" />
+                   <span class="text-muted-foreground">২৪/৭ খোলা</span>
+                 </div>
+               </div>
+
 
               <!-- Doctors at this branch -->
               <div class="border-t border-border pt-6 mb-6">

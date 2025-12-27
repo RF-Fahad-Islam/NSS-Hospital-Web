@@ -24,13 +24,14 @@ const stats = [
           <div class="animate-fade-up opacity-0">
             <span class="inline-flex items-center gap-2 px-4 py-2 bg-primary-foreground/10 backdrop-blur-sm rounded-full text-primary-foreground/90 text-sm font-medium mb-6">
               <span class="w-2 h-2 bg-secondary rounded-full animate-pulse-soft" />
-              ১৯৮৫ সাল থেকে বিশ্বস্ত স্বাস্থ্যসেবা
+              ১৯৭৭ সাল থেকে বিশ্বস্ত স্বাস্থ্যসেবা
             </span>
           </div>
 
           <h1 class="heading-xl text-primary-foreground mb-6 animate-fade-up opacity-0 stagger-1 text-balance">
-            <span class="block text-5xl md:text-7xl font-extrabold tracking-tight mb-2">এনএসএস</span>
+            <span class="block text-5xl md:text-7xl font-extrabold tracking-tight mb-2">NSS <small class="tracking-tight font-extralight text-[33px] text-muted">পরিচালিত</small></span> 
             <span class="block text-3xl md:text-5xl font-bold tracking-tight mb-4">মা স্বাস্থ্য সেবা কেন্দ্র</span>
+            <span class="block text-3xl md:text-5xl font-bold tracking-tight mb-4">মেরি ক্লিনিক</span>
             <span class="text-secondary-foreground/90 text-2xl md:text-3xl font-medium block">সামাজিক পরিবর্তনের জন্য জনগণের অংশগ্রহণ</span>
           </h1>
 

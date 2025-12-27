@@ -16,7 +16,7 @@ const { data: branches } = await useAsyncData<Branch[]>('branches-home', async (
   const { data } = await supabase
     .from('branches')
     .select('*')
-    .order('address', { ascending: true })
+    .order('sequence', { ascending: true, nullsFirst: false })
   return (data as Branch[]) || []
 })
 
@@ -26,6 +26,7 @@ const { data: doctors } = await useAsyncData('doctors-home', async () => {
     .from('doctors')
     .select('id, name, image, branch_id')
     .eq('role', 'doctor')
+    .order('sequence', { ascending: true, nullsFirst: false })
   return (data as any[]) || []
 })
 

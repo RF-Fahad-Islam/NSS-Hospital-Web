@@ -21,7 +21,7 @@ interface Doctor {
 }
 
 const { data: branches } = await useAsyncData('branches-data', async () => {
-  const { data } = await supabase.from('branches').select('id, name, address')
+  const { data } = await supabase.from('branches').select('id, name, address').order('sequence', { ascending: true, nullsFirst: false })
   return data || []
 })
 
@@ -30,6 +30,7 @@ const { data: doctors } = await useAsyncData('doctors-home', async () => {
     .from('doctors')
     .select('*')
     .eq('role', 'doctor')
+    .order('sequence', { ascending: true, nullsFirst: false })
     .limit(18)
   
   return data as Doctor[]

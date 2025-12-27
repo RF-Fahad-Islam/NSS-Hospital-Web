@@ -119,26 +119,32 @@ const filteredBranches = computed(() => {
   )
 })
 
-const filteredDoctors = computed(() => {
-  let filtered = doctors.value
-  
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(d => 
-      d.name.toLowerCase().includes(query) ||
-      d.specialty.toLowerCase().includes(query)
-    )
-  }
+const filteredDoctors = computed({
+  get: () => {
+    let filtered = doctors.value
+    
+    if (searchQuery.value) {
+      const query = searchQuery.value.toLowerCase()
+      filtered = filtered.filter(d => 
+        d.name.toLowerCase().includes(query) ||
+        d.specialty.toLowerCase().includes(query)
+      )
+    }
 
-  if (doctorFilter.value !== 'all') {
-    filtered = filtered.filter(d => d.role === doctorFilter.value)
-  }
+    if (doctorFilter.value !== 'all') {
+      filtered = filtered.filter(d => d.role === doctorFilter.value)
+    }
 
-  if (selectedBranchFilter.value !== 'all') {
-    filtered = filtered.filter(d => d.branch_id === selectedBranchFilter.value)
+    if (selectedBranchFilter.value !== 'all') {
+      filtered = filtered.filter(d => d.branch_id === selectedBranchFilter.value)
+    }
+    
+    return filtered
+  },
+  set: (value) => {
+    // Update the base doctors array when reordering
+    doctors.value = value
   }
-  
-  return filtered
 })
 
 const filteredServices = computed(() => {
@@ -149,7 +155,10 @@ const filteredServices = computed(() => {
   )
 })
 
-
+// Get manager for a branch
+const getManagerForBranch = (branchAddress: string) => {
+  return doctors.value.find(d => d.role === 'management' && d.branch_id === branchAddress)
+}
 
 // Analytics state
 const totalVisits = ref(0)
@@ -939,6 +948,19 @@ const handleLogout = async () => {
               <div class="p-6">
                 <h3 class="font-semibold text-lg text-foreground mb-2">{{ branch.name }}</h3>
                 <p class="text-sm text-muted-foreground mb-4">{{ branch.address }}</p>
+                
+                <!-- Manager Badge -->
+                <div v-if="getManagerForBranch(branch.address)" class="mb-4 inline-flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-full border border-primary/20">
+                  <div class="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                    <img 
+                      :src="getManagerForBranch(branch.address)?.image" 
+                      :alt="getManagerForBranch(branch.address)?.name"
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span class="text-sm font-medium text-primary">{{ getManagerForBranch(branch.address)?.name }}</span>
+                </div>
+                
                 <div class="space-y-2 mb-4">
                   <div class="flex items-center gap-2 text-sm">
                     <Phone class="w-4 h-4 text-muted-foreground" />
@@ -1028,7 +1050,7 @@ const handleLogout = async () => {
                 class="px-3 py-2 border border-border rounded-lg bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
              >
                 <option value="all">All Branches</option>
-                <option v-for="b in branches" :key="b.id" :value="b.address">{{ b.name }}</option>
+                <option v-for="b in branches" :key="b.id" :value="b.address">{{ b.name }} - {{ b.address }}</option>
              </select>
           </div>
           <button
@@ -1041,7 +1063,7 @@ const handleLogout = async () => {
         </div>
 
         <draggable 
-          v-model="doctors" 
+          v-model="filteredDoctors" 
           @end="updateDoctorOrder"
           item-key="id"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -1055,7 +1077,7 @@ const handleLogout = async () => {
               <div class="drag-handle absolute top-2 left-2 z-10 cursor-move p-2 bg-background/80 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
                 <GripVertical class="w-5 h-5 text-muted-foreground" />
               </div>
-              <img :src="doctor.image" :alt="doctor.name" class="w-full h-48 object-cover" />
+              <img :src="doctor.image" :alt="doctor.name" class="w-full max-h-96 object-contain bg-muted" />
               <div class="p-6">
                 <h3 class="font-semibold text-lg text-foreground mb-1">{{ doctor.name }}</h3>
                 <p class="text-sm text-primary mb-2">{{ doctor.specialty }}</p>
@@ -1076,11 +1098,14 @@ const handleLogout = async () => {
                   </button>
                 </div>
                 
-                <div class="mt-4 pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-                   <span class="flex items-center gap-1">
-                     <Building2 class="w-3 h-3" />
-                     {{ branches.find(b => b.address === doctor.branch_id)?.name || 'Unknown Branch' }}
-                   </span>
+                <div class="mt-4 pt-4 border-t border-border text-xs text-muted-foreground">
+                   <div class="flex items-start gap-2">
+                     <Building2 class="w-3 h-3 mt-0.5 flex-shrink-0" />
+                     <div class="flex flex-col">
+                       <span class="font-medium text-foreground">{{ branches.find(b => b.address === doctor.branch_id)?.name || 'Unknown Branch' }}</span>
+                       <span class="text-[11px]">{{ branches.find(b => b.address === doctor.branch_id)?.address || 'No address' }}</span>
+                     </div>
+                   </div>
 
                 </div>
               </div>
@@ -1403,7 +1428,18 @@ const handleLogout = async () => {
               />
             </div>
             
-            
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">Specialty/Post</label>
+              <input
+                v-model="doctorForm.specialty"
+                type="text"
+                class="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Cardiology, HR, Manager etc."
+              />
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
             <div>
                <label class="block text-sm font-medium text-foreground mb-2">Role</label>
                <select
@@ -1415,11 +1451,7 @@ const handleLogout = async () => {
                  <option value="management">Management</option>
                </select>
             </div>
-          </div>
-          
-
-          
-          <div class="grid grid-cols-3 gap-4">
+            
             <div>
               <label class="block text-sm font-medium text-foreground mb-2">Experience</label>
               <input
@@ -1429,7 +1461,12 @@ const handleLogout = async () => {
                 placeholder="10+ Years"
               />
             </div>
+          </div>
+          
+          
+          <div class="grid grid-cols-2 gap-4">
             
+
             <div>
               <label class="block text-sm font-medium text-foreground mb-2">Rating</label>
               <input

@@ -11,8 +11,43 @@ import {
   ArrowRight,
   Globe,
   Smartphone,
-  Printer
+  Printer,
+  Heart,
+  Baby,
+  Brain,
+  Bone,
+  Eye,
+  Stethoscope,
+  Ambulance,
+  Activity,
+  Pill,
+  Microscope,
+  Syringe
 } from 'lucide-vue-next'
+import { supabase } from '@/lib/supabase'
+
+interface Service {
+  id: string
+  title: string
+  description?: string
+  full_description?: string
+  icon_name: string
+}
+
+// Icon mapping
+const iconMap: Record<string, any> = {
+  Heart,
+  Baby,
+  Brain,
+  Bone,
+  Eye,
+  Stethoscope,
+  Ambulance,
+  Activity,
+  Pill,
+  Microscope,
+  Syringe
+}
 
 const quickLinks = [
   { name: 'আমাদের সম্পর্কে', href: '/about-us' },
@@ -22,14 +57,19 @@ const quickLinks = [
   { name: 'যোগাযোগ', href: '#contact' },
 ]
 
-const services = [
-  'কার্ডিওলজি',
-  'শিশুরোগ',
-  'স্নায়ুরোগ',
-  'অর্থোপেডিক্স',
-  'জরুরী সেবা',
-  'ল্যাবরেটরি',
-]
+// Fetch services from database with icon_name
+const { data: services } = await useAsyncData<Service[]>('footer-services', async () => {
+  const { data } = await supabase
+    .from('services')
+    .select('id, title, icon_name')
+    .order('created_at', { ascending: true })
+  return (data as Service[]) || []
+})
+
+// Function to get the icon component
+const getIcon = (iconName: string) => {
+  return iconMap[iconName] || Stethoscope
+}
 
 const socialLinks = [
   { icon: Facebook, href: '#', label: 'Facebook' },
@@ -85,14 +125,14 @@ const socialLinks = [
         <div>
           <h4 class="font-semibold text-lg mb-6">আমাদের সেবাসমূহ</h4>
           <ul class="space-y-3">
-            <li v-for="service in services" :key="service">
-              <a
-                href="#services"
+            <li v-for="service in services" :key="service.id">
+              <NuxtLink
+                :to="`/services#${service.id}`"
                 class="text-background/70 hover:text-secondary transition-colors inline-flex items-center gap-2 group"
               >
-                <ArrowRight class="w-4 h-4 opacity-0 -ml-6 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-                {{ service }}
-              </a>
+                <component :is="getIcon(service.icon_name)" class="w-4 h-4 flex-shrink-0" />
+                {{ service.title }}
+              </NuxtLink>
             </li>
           </ul>
         </div>
