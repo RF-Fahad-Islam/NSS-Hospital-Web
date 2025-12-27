@@ -6,6 +6,7 @@ export interface BranchForm {
     email: string
     map_url: string
     image: string
+    manager_name?: string
 }
 
 export interface DoctorForm {

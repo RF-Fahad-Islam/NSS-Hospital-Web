@@ -3,7 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { 
   Bell, Calendar, LogOut, Clock, User, Phone, Mail, 
   CheckCircle, XCircle, Eye, Loader2, Stethoscope, Building2,
-  Plus, Edit, Trash2, X, Save, Search, BarChart3, TrendingUp
+  Plus, Edit, Trash2, X, Save, Search, BarChart3, TrendingUp, Globe
 } from 'lucide-vue-next'
 import { format, subDays, startOfDay, endOfDay, eachDayOfInterval } from 'date-fns'
 import { supabase } from '@/lib/supabase'
@@ -51,7 +51,8 @@ const branchForm = ref<BranchForm>({
   phone: '',
   email: '',
   map_url: '',
-  image: ''
+  image: '',
+  manager_name: ''
 })
 
 // Doctors state
@@ -72,6 +73,7 @@ const doctorForm = ref<DoctorForm>({
   is_doctor: true
 })
 const doctorFilter = ref<'all' | 'doctor' | 'staff'>('all')
+const selectedBranchFilter = ref<string>('all')
 
 // Services state
 const services = ref<Service[]>([])
@@ -128,6 +130,10 @@ const filteredDoctors = computed(() => {
   if (doctorFilter.value !== 'all') {
     const isDoctor = doctorFilter.value === 'doctor'
     filtered = filtered.filter(d => d.is_doctor === isDoctor)
+  }
+
+  if (selectedBranchFilter.value !== 'all') {
+    filtered = filtered.filter(d => d.branch_id === selectedBranchFilter.value)
   }
   
   return filtered
@@ -262,7 +268,8 @@ const saveBranch = async () => {
       phone: branchForm.value.phone,
       email: branchForm.value.email,
       map_url: branchForm.value.map_url,
-      image: branchForm.value.image
+      image: branchForm.value.image,
+      manager_name: branchForm.value.manager_name
     }
 
     if (editingBranch.value) {
@@ -324,6 +331,19 @@ const openDoctorForm = (doctor?: Doctor) => {
         formData.is_doctor = true
     }
 
+    // Verify branch exists (using address as key per user request)
+    const branchExists = branches.value.some(b => b.address === formData.branch_id)
+    if (!branchExists) {
+        // Fallback: check if it matches an ID, if so, map to address
+        const branchById = branches.value.find(b => b.id === formData.branch_id)
+        if (branchById) {
+             formData.branch_id = branchById.address
+        } else {
+             console.warn(`Doctor ${doctor.name} has invalid branch_id: ${formData.branch_id}. Resetting selection.`)
+             formData.branch_id = ''
+        }
+    }
+
     doctorForm.value = formData
   } else {
     editingDoctor.value = null
@@ -342,7 +362,7 @@ const resetDoctorForm = () => {
     branch_id: '',
     education: '',
     bio: '',
-    available_days: [],
+    available_days: ['Everyday'],
     is_doctor: true
   }
 }
@@ -643,18 +663,7 @@ const handleDeleteConfirm = async () => {
 onMounted(async () => {
   let { data: { session } } = await supabase.auth.getSession()
   
-  // DEV MOCK: Bypass auth in development if no session
-  if (!session && (import.meta.dev || import.meta.env.MODE === 'development')) {
-      console.warn('Dev mode: Using mock admin session')
-      session = {
-          user: { id: 'mock-admin-id', email: 'mock@test.com' },
-          access_token: 'mock-token',
-          refresh_token: 'mock-refresh',
-          token_type: 'bearer',
-          expires_in: 3600,
-          expires_at: Date.now() + 3600
-      } as any
-  }
+  // DEV MOCK: Removed for Production Readiness
   
   if (!session) {
     router.push('/admin')
@@ -669,13 +678,9 @@ onMounted(async () => {
     .maybeSingle()
 
   if (!roleData) {
-    if (import.meta.dev || import.meta.env.MODE === 'development') {
-      console.warn('Dev mode: Bypassing admin dashboard role check')
-    } else {
-      await supabase.auth.signOut()
-      router.push('/admin')
-      return
-    }
+    await supabase.auth.signOut()
+    router.push('/admin')
+    return
   }
 
   await Promise.all([
@@ -722,8 +727,6 @@ const handleLogout = async () => {
   await supabase.auth.signOut()
   router.push('/admin')
 }
-
-const isDev = import.meta.dev || import.meta.env.MODE === 'development'
 </script>
 
 <template>
@@ -739,15 +742,33 @@ const isDev = import.meta.dev || import.meta.env.MODE === 'development'
             <div>
               <h1 class="font-bold text-foreground flex items-center gap-2">
                 NSS Admin
-                <span v-if="isDev" class="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 text-[10px] font-bold uppercase tracking-wider">
-                  Dev Mode
-                </span>
               </h1>
               <p class="text-xs text-muted-foreground">Dashboard</p>
             </div>
           </div>
           
           <div class="flex items-center gap-4">
+            <!-- Main Website Link -->
+            <NuxtLink 
+              to="/" 
+              class="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-primary bg-muted/50 hover:bg-primary/10 rounded-lg transition-colors"
+              target="_blank"
+            >
+              <Globe class="w-4 h-4" />
+              Main Website
+            </NuxtLink>
+
+            <!-- Live Status -->
+            <div class="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-600 rounded-full border border-green-200/50">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              <span class="text-xs font-bold tracking-wide uppercase">Live</span>
+            </div>
+
+            <div class="h-6 w-px bg-border hidden md:block"></div>
+
             <div class="relative">
               <Bell class="w-6 h-6 text-muted-foreground" />
               <span v-if="unreadCount > 0" class="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs rounded-full flex items-center justify-center font-medium">
@@ -898,13 +919,13 @@ const isDev = import.meta.dev || import.meta.env.MODE === 'development'
         <div class="flex justify-between items-center mb-6">
           <div class="flex items-center gap-4">
             <h2 class="text-xl font-semibold text-foreground">Doctors & Staff</h2>
-            <div class="flex bg-muted rounded-lg p-1">
+            <div class="inline-flex rounded-lg border border-border bg-background p-1 gap-1">
               <button
                 @click="doctorFilter = 'all'"
                 :class="[
-                  'px-3 py-1.5 text-sm font-medium rounded-md transition-all',
-                  doctorFilter === 'all' 
-                    ? 'bg-background text-foreground shadow-sm' 
+                  'px-3 py-1.5 rounded-md text-sm font-medium transition-all',
+                  doctorFilter === 'all'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 ]"
               >
@@ -913,9 +934,9 @@ const isDev = import.meta.dev || import.meta.env.MODE === 'development'
               <button
                 @click="doctorFilter = 'doctor'"
                 :class="[
-                  'px-3 py-1.5 text-sm font-medium rounded-md transition-all',
-                  doctorFilter === 'doctor' 
-                    ? 'bg-background text-foreground shadow-sm' 
+                  'px-3 py-1.5 rounded-md text-sm font-medium transition-all',
+                  doctorFilter === 'doctor'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 ]"
               >
@@ -924,15 +945,24 @@ const isDev = import.meta.dev || import.meta.env.MODE === 'development'
               <button
                 @click="doctorFilter = 'staff'"
                 :class="[
-                  'px-3 py-1.5 text-sm font-medium rounded-md transition-all',
-                  doctorFilter === 'staff' 
-                    ? 'bg-background text-foreground shadow-sm' 
+                  'px-3 py-1.5 rounded-md text-sm font-medium transition-all',
+                  doctorFilter === 'staff'
+                    ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground'
                 ]"
               >
                 Staff
               </button>
             </div>
+            
+             <!-- NEW Branch Filter Dropdown -->
+             <select 
+                v-model="selectedBranchFilter" 
+                class="px-3 py-2 border border-border rounded-lg bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+             >
+                <option value="all">All Branches</option>
+                <option v-for="b in branches" :key="b.id" :value="b.address">{{ b.name }}</option>
+             </select>
           </div>
           <button
             @click="openDoctorForm()"
@@ -968,6 +998,14 @@ const isDev = import.meta.dev || import.meta.env.MODE === 'development'
                 >
                   <Trash2 class="w-4 h-4" />
                 </button>
+              </div>
+              
+              <div class="mt-4 pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+                 <span class="flex items-center gap-1">
+                   <Building2 class="w-3 h-3" />
+                   {{ branches.find(b => b.address === doctor.branch_id)?.name || 'Unknown Branch' }}
+                 </span>
+
               </div>
             </div>
           </div>
@@ -1192,6 +1230,17 @@ const isDev = import.meta.dev || import.meta.env.MODE === 'development'
             ></textarea>
           </div>
           
+           <!-- Manager Name Input (Moved from Doctor) -->
+           <div>
+              <label class="block text-sm font-medium text-foreground mb-2">Manager Name</label>
+              <input
+                v-model="branchForm.manager_name"
+                type="text"
+                class="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Branch Manager Name"
+              />
+            </div>
+          
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-foreground mb-2">Phone</label>
@@ -1290,6 +1339,8 @@ const isDev = import.meta.dev || import.meta.env.MODE === 'development'
             </div>
           </div>
           
+
+          
           <div class="grid grid-cols-3 gap-4">
             <div>
               <label class="block text-sm font-medium text-foreground mb-2">Experience</label>
@@ -1320,7 +1371,7 @@ const isDev = import.meta.dev || import.meta.env.MODE === 'development'
                 class="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="">Select Branch</option>
-                <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+                <option v-for="branch in branches" :key="branch.id" :value="branch.address">
                   {{ branch.name }} - {{ branch.address }}
                 </option>
               </select>

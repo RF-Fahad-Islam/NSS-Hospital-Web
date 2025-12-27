@@ -1,22 +1,41 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Menu, X, Phone } from 'lucide-vue-next'
+import { Menu, X, Phone, LayoutDashboard } from 'lucide-vue-next'
+import { supabase } from '@/lib/supabase'
 
 const route = useRoute()
 const isScrolled = ref(false)
 const isMobileMenuOpen = ref(false)
+const isAdmin = ref(false)
 const isHomePage = computed(() => route.path === '/')
 
-onMounted(() => {
+onMounted(async () => {
   const handleScroll = () => {
     isScrolled.value = window.scrollY > 20
   }
   window.addEventListener('scroll', handleScroll)
+  
+  // Check admin status
+  const { data: { session } } = await supabase.auth.getSession()
+  if (session) {
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', session.user.id)
+      .eq('role', 'admin')
+      .maybeSingle()
+      
+    if (roleData) {
+      isAdmin.value = true
+    }
+  }
+
   onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 })
 
 const navLinks = [
   { name: 'আমাদের সম্পর্কে', href: '/about-us', isAnchor: false },
+  { name: 'NSS', href: '/nss', isAnchor: false },
   { name: 'সেবাসমূহ', href: '/services', isAnchor: false },
   { name: 'ডাক্তার ও স্টাফ', href: '/doctors', isAnchor: false },
   { name: 'শাখাসমূহ', href: '/branches', isAnchor: false },
@@ -56,6 +75,16 @@ const navLinks = [
 
         <!-- CTA Buttons -->
         <div class="hidden lg:flex items-center gap-4">
+          <!-- Admin Dashboard Link -->
+          <NuxtLink 
+            v-if="isAdmin" 
+            to="/admin/dashboard" 
+            class="hidden lg:flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 rounded-full transition-colors"
+          >
+            <LayoutDashboard class="w-4 h-4" />
+            <span>Dashboard</span>
+          </NuxtLink>
+
           <a href="tel:+1234567890" class="btn-ghost gap-2">
             <Phone class="w-4 h-4" />
             <span>জরুরী সেবা</span>
@@ -90,6 +119,16 @@ const navLinks = [
           </NuxtLink>
           
           <div class="pt-4 mt-2 border-t border-border flex flex-col gap-3 px-4">
+            <NuxtLink 
+              v-if="isAdmin" 
+              to="/admin/dashboard" 
+              class="flex items-center gap-2 px-4 py-3 bg-primary/10 rounded-lg font-medium text-primary"
+              @click="isMobileMenuOpen = false"
+            >
+              <LayoutDashboard class="w-4 h-4" />
+              <span>Admin Dashboard</span>
+            </NuxtLink>
+
             <a href="tel:+1234567890" class="btn-ghost justify-center gap-2">
               <Phone class="w-4 h-4" />
               <span>জরুরী কল</span>

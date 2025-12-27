@@ -18,6 +18,7 @@ interface Doctor {
     address: string
     name: string
   } | null
+  is_doctor?: boolean
 }
 
 useHead({
@@ -31,6 +32,7 @@ const route = useRoute()
 const router = useRouter()
 const branchParam = route.query.branch as string
 const selectedBranch = ref<string>(branchParam || 'all')
+const selectedCategory = ref<'doctors' | 'staff'>('doctors')
 const searchQuery = ref('')
 
 interface Branch {
@@ -60,6 +62,10 @@ const { data: doctors } = await useAsyncData<Doctor[]>('doctors-list', async () 
 const filteredDoctors = computed(() => {
   let list = doctors.value || []
   
+  // Filter by Category (Doctor vs Staff)
+  const isDoctor = selectedCategory.value === 'doctors'
+  list = list.filter(d => !!d.is_doctor === isDoctor)
+
   // Filter by branch address
   if (selectedBranch.value !== 'all') {
     list = list.filter(doctor => {
@@ -135,9 +141,31 @@ const getImageUrl = (path: string) => {
     <!-- Filter & Search Section -->
     <section class="py-8 bg-card border-b border-border sticky top-20 z-40 backdrop-blur-md bg-card/80">
       <div class="section-container">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div class="flex flex-wrap items-center gap-4">
-            <span class="text-foreground font-medium whitespace-nowrap">শাখা অনুযায়ী ফিল্টার করুন:</span>
+        <div class="flex flex-col gap-6">
+          
+          <!-- Category Tabs -->
+          <div class="flex justify-center md:justify-start">
+            <div class="bg-muted p-1 rounded-xl inline-flex">
+              <button 
+                @click="selectedCategory = 'doctors'"
+                class="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all"
+                :class="selectedCategory === 'doctors' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'"
+              >
+                বিশেষজ্ঞ ডাক্তার
+              </button>
+              <button 
+                @click="selectedCategory = 'staff'"
+                class="px-6 py-2.5 rounded-lg text-sm font-semibold transition-all"
+                :class="selectedCategory === 'staff' ? 'bg-background text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'"
+              >
+                মেডিকেল স্টাফ
+              </button>
+            </div>
+          </div>
+
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="flex flex-wrap items-center gap-4">
+              <span class="text-foreground font-medium whitespace-nowrap">শাখা অনুযায়ী ফিল্টার করুন:</span>
             <div class="flex flex-wrap gap-2">
               <button
                 @click="setBranch('all')"
@@ -186,6 +214,7 @@ const getImageUrl = (path: string) => {
           </div>
         </div>
       </div>
+    </div>
     </section>
 
     <section class="section-padding">

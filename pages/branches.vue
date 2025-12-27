@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MapPin, Phone, Mail, Clock, Users, ArrowRight } from 'lucide-vue-next'
+import { MapPin, Phone, Mail, Clock, Users, ArrowRight, UserCheck } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
 useHead({
@@ -17,6 +17,7 @@ interface Branch {
   phone: string
   email: string
   map_url: string
+  manager_name?: string
 }
 
 const searchQuery = ref('')
@@ -163,6 +164,10 @@ const getImageUrl = (path: string) => {
                   <a :href="`mailto:${branch.email}`" class="text-muted-foreground hover:text-primary transition-colors">
                     {{ branch.email }}
                   </a>
+                </div>
+                 <div v-if="branch.manager_name" class="flex items-center gap-3">
+                  <UserCheck class="w-5 h-5 text-primary" />
+                  <span class="text-muted-foreground">Manager: {{ branch.manager_name }}</span>
                 </div>
                 <div class="flex items-center gap-3">
                   <Clock class="w-5 h-5 text-primary" />

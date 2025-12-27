@@ -29,6 +29,7 @@ const { data: doctors } = await useAsyncData('doctors-home', async () => {
   const { data } = await supabase
     .from('doctors')
     .select('*')
+    .eq('is_doctor', true)
     .limit(18)
   
   return data as Doctor[]

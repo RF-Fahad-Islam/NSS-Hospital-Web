@@ -146,25 +146,6 @@ const socialLinks = [
         </div>
       </div>
 
-      <!-- Newsletter -->
-      <div class="mt-12 pt-10 border-t border-background/10">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div>
-            <h4 class="font-semibold text-lg mb-2">আমাদের নিউজলেটার সাবস্ক্রাইব করুন</h4>
-            <p class="text-background/70">আপনার ইনবক্সে স্বাস্থ্য টিপস এবং আপডেট পান।</p>
-          </div>
-          <form class="flex gap-3 w-full md:w-auto" @submit.prevent>
-            <input
-              type="email"
-              placeholder="আপনার ইমেল লিখুন"
-              class="flex-1 md:w-64 px-4 py-3 bg-background/10 border border-background/20 rounded-lg text-background placeholder:text-background/50 focus:outline-none focus:ring-2 focus:ring-secondary/50"
-            />
-            <button type="submit" class="btn-secondary shrink-0">
-              সাবস্ক্রাইব
-            </button>
-          </form>
-        </div>
-      </div>
     </div>
 
     <!-- Bottom Bar -->
