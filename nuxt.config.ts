@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     url: process.env.VITE_SUPABASE_URL,
     key: process.env.VITE_SUPABASE_PUBLISHABLE_KEY
   },
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', 'aos/dist/aos.css'],
   srcDir: '.',
   build: {
     transpile: ['lucide-vue-next']

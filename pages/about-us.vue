@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { CheckCircle, Heart, Shield, Users, Award } from 'lucide-vue-next'
-import aboutHeroImage from '~/assets/head.jpeg'
+const aboutHeroImage = 'https://images.unsplash.com/photo-1576091160550-217359f4ecf8?auto=format&fit=crop&w=1200&q=80'
 
 useHead({
-  title: 'আমাদের সম্পর্কে',
+  title: 'About Us | Maa Health Service Center',
   meta: [
-    { name: 'description', content: 'মা স্বাস্থ্য সেবা কেন্দ্র এবং মেরি ক্লিনিক—যত্ন, বিশ্বাস ও নিরাপদ স্বাস্থ্যসেবার প্রতিশ্রুতি। NSS পরিচালিত সেবাসমূহ।' }
+    { name: 'description', content: 'Maa Health Service Center and Mary Clinic - Promise of Care, Trust, and Safe Healthcare. Services operated by NSS.' }
   ]
 })
 
@@ -33,7 +33,7 @@ const trustPoints = [
   <div class="pt-24 pb-16 font-bangla">
     <div class="section-container">
       <!-- Header Section -->
-      <div class="max-w-4xl mx-auto text-center mb-16">
+      <div class="max-w-4xl mx-auto text-center mb-16" data-aos="zoom-in-up">
         <span class="text-secondary font-semibold tracking-wide uppercase text-sm">
           আমাদের সম্পর্কে
         </span>
@@ -47,15 +47,15 @@ const trustPoints = [
 
       <!-- Vision/Mission Section -->
       <div class="grid lg:grid-cols-2 gap-12 items-center mb-24">
-        <div class="rounded-2xl overflow-hidden shadow-medical-lg relative group">
+        <div class="rounded-2xl overflow-hidden shadow-medical-lg relative group" data-aos="zoom-in-up" data-aos-delay="100">
            <img
             :src="aboutHeroImage"
             alt="Compassionate Care"
-            class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
         </div>
         <div class="space-y-6">
-          <div class="bg-card p-6 rounded-xl shadow-sm border border-border/50">
+          <div class="bg-card p-6 rounded-xl shadow-sm border border-border/50 hover:shadow-md transition-shadow hover:scale-[1.02] duration-300" data-aos="zoom-in-up" data-aos-delay="200">
             <h3 class="text-xl font-bold text-foreground mb-3 flex items-center gap-2">
               <Heart class="w-5 h-5 text-secondary" />
               আমাদের বিশ্বাস
@@ -65,7 +65,7 @@ const trustPoints = [
             </p>
           </div>
           
-          <div class="bg-card p-6 rounded-xl shadow-sm border border-border/50">
+          <div class="bg-card p-6 rounded-xl shadow-sm border border-border/50 hover:shadow-md transition-shadow hover:scale-[1.02] duration-300" data-aos="zoom-in-up" data-aos-delay="300">
             <h3 class="text-xl font-bold text-foreground mb-3 flex items-center gap-2">
               <Award class="w-5 h-5 text-secondary" />
                আমাদের অঙ্গীকার
@@ -79,38 +79,42 @@ const trustPoints = [
 
       <!-- Services List -->
       <div class="mb-24">
-        <h2 class="text-3xl font-bold text-center mb-12">আমাদের সেবা ও দক্ষতা</h2>
+        <h2 class="text-3xl font-bold text-center mb-12" data-aos="zoom-in-up">আমাদের সেবা ও দক্ষতা</h2>
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div v-for="(service, index) in services" :key="index" 
-               class="bg-card p-6 rounded-xl shadow-sm border border-border/50 hover:shadow-md transition-shadow">
+               class="bg-card p-6 rounded-xl shadow-sm border border-border/50 hover:shadow-md transition-all hover:scale-[1.05]"
+               data-aos="zoom-in-up"
+               :data-aos-delay="index * 100">
             <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <CheckCircle class="w-5 h-5 text-primary" />
             </div>
             <p class="font-medium text-foreground">{{ service }}</p>
           </div>
         </div>
-        <p class="text-center text-muted-foreground mt-8 italic">
+        <p class="text-center text-muted-foreground mt-8 italic" data-aos="zoom-in-up" data-aos-delay="400">
           প্রতিটি সেবায় আমরা স্বাস্থ্যবিধি, নিরাপত্তা ও রোগীর স্বাচ্ছন্দ্যকে সর্বোচ্চ গুরুত্ব দিয়ে থাকি।
         </p>
       </div>
 
       <!-- Trust Factors -->
-      <div class="bg-muted/30 rounded-3xl p-8 lg:p-12">
+      <div class="bg-muted/30 rounded-3xl p-8 lg:p-12" data-aos="zoom-in-up">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 class="text-3xl font-bold mb-8">কেন রোগীরা আমাদের ওপর আস্থা রাখেন</h2>
             <ul class="space-y-4">
-              <li v-for="(point, index) in trustPoints" :key="index" class="flex items-start gap-3">
+              <li v-for="(point, index) in trustPoints" :key="index" class="flex items-start gap-3"
+                  data-aos="zoom-in-up"
+                  :data-aos-delay="200 + (index * 100)">
                 <Shield class="w-6 h-6 text-secondary shrink-0 mt-1" />
                 <span class="text-lg text-muted-foreground">{{ point }}</span>
               </li>
             </ul>
-            <p class="mt-8 text-primary font-medium text-lg">
+            <p class="mt-8 text-primary font-medium text-lg" data-aos="zoom-in-up" data-aos-delay="600">
               আমাদের কাছে প্রতিটি রোগী গুরুত্বপূর্ণ, এবং আমরা প্রতিটি রোগীকে পরিবারের একজন সদস্যের মতো যত্ন করে থাকি।
             </p>
           </div>
-          <div class="relative">
-             <div class="aspect-square rounded-2xl overflow-hidden shadow-lg">
+          <div class="relative" data-aos="zoom-in-up" data-aos-delay="200">
+             <div class="aspect-square rounded-2xl overflow-hidden shadow-lg hover:scale-[1.02] transition-transform duration-500">
                <img 
                  src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80" 
                  alt="Trust and Care" 
@@ -123,7 +127,7 @@ const trustPoints = [
       </div>
 
       <!-- Closing -->
-      <div class="text-center mt-24">
+      <div class="text-center mt-24" data-aos="zoom-in-up">
          <h3 class="text-2xl font-bold text-foreground">
            আপনার ও আপনার পরিবারের স্বাস্থ্যসেবায় আমরা আছি—বিশ্বাস, যত্ন ও দায়িত্ব নিয়ে।
          </h3>

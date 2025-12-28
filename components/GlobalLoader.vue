@@ -15,7 +15,7 @@ defineProps<{
     >
       <div class="relative">
         <!-- Pulse Effect -->
-        <div class="absolute inset-0 bg-primary/20 rounded-full animate-ping" />
+        <div class="absolute inset-0 bg-primary/20 rounded-full animate-ping"></div>
         
         <!-- Logo/Icon Container -->
         <div class="relative w-32 h-32 bg-white rounded-full shadow-medical-lg flex items-center justify-center border-4 border-primary/10 p-4">
@@ -34,7 +34,7 @@ defineProps<{
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.5s ease;
+  transition: opacity 0.3s ease;
 }
 
 .fade-enter-from,

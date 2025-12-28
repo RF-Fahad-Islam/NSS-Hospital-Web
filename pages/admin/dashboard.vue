@@ -106,7 +106,7 @@ const galleryFormOpen = ref(false)
 const galleryForm = ref<GalleryForm>({
   src: '',
   alt: '',
-  category: 'Facility'
+  category: 'সফলতা'
 })
 
 // Delete Modal State
@@ -447,8 +447,8 @@ const saveDoctor = async () => {
     await fetchDoctors()
   } catch (error: any) {
     console.error('Error saving doctor:', error)
-    if (error.message?.includes('role')) {
-        alert('Critical Error: Database schema missing "role" column.\\nPlease run the "replace_is_doctor_with_role.sql" script in Supabase SQL Editor.')
+    if (error.message?.includes('role') || error.message?.includes('check constraint')) {
+        alert(`Database Error: ${error.message}\n\nPlease run the "replace_is_doctor_with_role.sql" script in Supabase SQL Editor to update the allowed roles.`)
     } else {
         alert(`Failed to save doctor: ${error.message || 'Unknown error'}`)
     }
@@ -609,7 +609,7 @@ const resetGalleryForm = () => {
   galleryForm.value = {
     src: '',
     alt: '',
-    category: 'Facility'
+    category: 'সফলতা'
   }
 }
 
@@ -926,7 +926,7 @@ const handleLogout = async () => {
 
       <!-- Branches Tab -->
       <div v-if="activeTab === 'branches'">
-        <div class="mb-6 flex items-center justify-between gap-4">
+        <div class="mb-6 flex items-center justify-between gap-4" data-aos="zoom-in-up">
           <div class="relative flex-1 max-w-md">
             <Search class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -953,9 +953,11 @@ const handleLogout = async () => {
           :animation="200"
           handle=".drag-handle"
         >
-          <template #item="{element: branch}">
+          <template #item="{element: branch, index}">
             <div
-              class="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-shadow relative group"
+              class="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all hover:scale-[1.02] duration-300 relative group"
+              data-aos="zoom-in-up"
+              :data-aos-delay="index * 50"
             >
               <div class="drag-handle absolute top-2 left-2 z-10 cursor-move p-2 bg-background/80 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
                 <GripVertical class="w-5 h-5 text-muted-foreground" />
@@ -1010,7 +1012,7 @@ const handleLogout = async () => {
 
       <!-- Doctors Tab -->
       <div v-if="activeTab === 'doctors'">
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center mb-6" data-aos="zoom-in-up">
           <div class="flex items-center gap-4">
             <h2 class="text-xl font-semibold text-foreground">Doctors & Staff</h2>
             <div class="inline-flex rounded-lg border border-border bg-background p-1 gap-1">
@@ -1086,9 +1088,11 @@ const handleLogout = async () => {
           :animation="200"
           handle=".drag-handle"
         >
-          <template #item="{element: doctor}">
+          <template #item="{element: doctor, index}">
             <div
-              class="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-shadow relative group"
+              class="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all hover:scale-[1.02] duration-300 relative group"
+              data-aos="zoom-in-up"
+              :data-aos-delay="index * 50"
             >
               <div class="drag-handle absolute top-2 left-2 z-10 cursor-move p-2 bg-background/80 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
                 <GripVertical class="w-5 h-5 text-muted-foreground" />
@@ -1132,7 +1136,7 @@ const handleLogout = async () => {
 
       <!-- Services Tab -->
       <div v-if="activeTab === 'services'">
-        <div class="mb-6 flex items-center justify-between gap-4">
+        <div class="mb-6 flex items-center justify-between gap-4" data-aos="zoom-in-up">
           <div class="relative flex-1 max-w-md">
             <Search class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -1153,9 +1157,11 @@ const handleLogout = async () => {
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div
-            v-for="service in filteredServices"
+            v-for="(service, index) in filteredServices"
             :key="service.id"
-            class="bg-card rounded-xl border border-border p-6 hover:shadow-lg transition-shadow"
+            class="bg-card rounded-xl border border-border p-6 hover:shadow-lg transition-all hover:scale-[1.02] duration-300"
+            data-aos="zoom-in-up"
+            :data-aos-delay="index * 50"
           >
             <div class="w-12 h-12 rounded-xl mb-4 flex items-center justify-center shadow-sm" :class="service.bg_color">
               <component :is="getIcon(service.icon_name)" class="w-6 h-6" :class="service.color" />
@@ -1184,7 +1190,7 @@ const handleLogout = async () => {
 
       <!-- Gallery Tab -->
       <div v-if="activeTab === 'gallery'">
-        <div class="mb-6 flex items-center justify-between gap-4">
+        <div class="mb-6 flex items-center justify-between gap-4" data-aos="zoom-in-up">
           <div class="relative flex-1 max-w-md">
             <Search class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -1205,9 +1211,11 @@ const handleLogout = async () => {
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div
-            v-for="item in galleryItems"
+            v-for="(item, index) in galleryItems"
             :key="item.id"
-            class="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-shadow"
+            class="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all hover:scale-[1.02] duration-300"
+            data-aos="zoom-in-up"
+            :data-aos-delay="index * 50"
           >
             <img :src="item.src" :alt="item.alt" class="w-full h-48 object-cover" />
             <div class="p-4">
@@ -1713,10 +1721,9 @@ const handleLogout = async () => {
               v-model="galleryForm.category"
               class="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              <option value="Facility">Facility</option>
-              <option value="Interior">Interior</option>
-              <option value="Medical">Medical</option>
-              <option value="Team">Team</option>
+              <option value="সফলতা">সফলতা</option>
+              <option value="মেডিকেল টিম">মেডিকেল টিম</option>
+              <option value="কার্যক্রম">কার্যক্রম</option>
             </select>
           </div>
           

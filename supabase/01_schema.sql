@@ -3,9 +3,9 @@ create extension if not exists "uuid-ossp";
 
 -- 1. Create Branches Table
 create table branches (
-  id text primary key,
+  id text not null,
   name text not null,
-  address text not null unique,
+  address text primary key,
   phone text not null,
   email text not null,
   map_url text not null,
@@ -27,17 +27,18 @@ create table doctors (
   experience text not null,
   rating numeric not null,
   image text not null,
-  branch_id text not null references branches(id) on delete cascade,
+  branch_id text not null references branches(address) on delete cascade,
   education text,
   bio text,
   languages text[] not null,
   available_days text[] not null,
-  role text not null default 'staff' check (role in ('doctor', 'staff', 'management')),
+  role text not null default 'stuff' check (role in ('doctor', 'stuff', 'management')),
   sequence integer default 0,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
-comment on column doctors.role is 'Role type: doctor, staff, or management';
+comment on column doctors.branch_id is 'References branches(address) - the primary key of branches table';
+comment on column doctors.role is 'Role type: doctor, stuff, or management';
 comment on column doctors.sequence is 'Display order for doctors (lower numbers show first)';
 create index idx_doctors_sequence on doctors(sequence);
 

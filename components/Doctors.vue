@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import { ArrowRight, Star, MapPin, Stethoscope, BadgeCheck } from 'lucide-vue-next'
+import { computed } from 'vue'
 import { supabase } from '@/lib/supabase'
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Autoplay, Grid } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/grid';
 
 interface Doctor {
   id: string
@@ -20,7 +16,7 @@ interface Doctor {
   }
 }
 
-const { data: doctors } = await useAsyncData('doctors-home', async () => {
+const { data: doctors } = await useAsyncData('home-doctors-list', async () => {
   const { data } = await supabase
     .from('doctors')
     .select('*, branches(name, address)')
@@ -34,7 +30,6 @@ const { data: doctors } = await useAsyncData('doctors-home', async () => {
 const displayedDoctors = computed(() => {
   if (!doctors.value) return []
   return doctors.value.map((d: any) => {
-    // Supabase might return branches as an array or object depending on relation detection
     const branchData = Array.isArray(d.branches) ? d.branches[0] : d.branches
     return {
       ...d,
@@ -42,20 +37,13 @@ const displayedDoctors = computed(() => {
     }
   })
 })
-
-const getImageUrl = (path: string) => {
-  if (!path) return ''
-  if (path.startsWith('http')) return path
-  const { data } = supabase.storage.from('doctors').getPublicUrl(path)
-  return data.publicUrl
-}
 </script>
 
 <template>
   <section id="doctors" class="section-padding">
     <div class="section-container">
       <!-- Section Header -->
-      <div class="text-center max-w-2xl mx-auto mb-16">
+      <div class="text-center max-w-2xl mx-auto mb-16" data-aos="fade-up">
         <span class="text-secondary font-semibold tracking-wide uppercase text-sm">
           আমাদের টিম
         </span>
@@ -63,123 +51,23 @@ const getImageUrl = (path: string) => {
           আমাদের বিশেষজ্ঞ চিকিৎসকদের সাথে পরিচিত হোন
         </h2>
         <p class="text-muted-foreground text-lg">
-          আমাদের উচ্চ যোগ্যতাসম্পন্ন চিকিৎসকদের দল দীর্ঘদিনের অভিজ্ঞতা এবং আপনার সুস্থতার প্রতি অকৃত্রিম প্রতিশ্রুতি নিয়ে সেবা প্রদান করেন।
+        আমাদের উচ্চ যোগ্যতাসম্পন্ন ও অভিজ্ঞ চিকিৎসকদের দল নারীদের সুস্থতা ও সম্মানকে সর্বোচ্চ গুরুত্ব দিয়ে আন্তরিকতা, পেশাদারিত্ব এবং নিরবচ্ছিন্ন যত্নের মাধ্যমে সেবা প্রদান করে।
         </p>
       </div>
-
-      <!-- Doctors Slider -->
-      <div class="w-full">
-        <ClientOnly>
-          <swiper
-            :modules="[Autoplay, Grid]"
-            :slides-per-view="1.2"
-            :space-between="20"
-            :loop="true"
-            :autoplay="{
-              delay: 3000,
-              disableOnInteraction: false,
-            }"
-            :breakpoints="{
-              '640': {
-                slidesPerView: 2,
-                spaceBetween: 20,
-              },
-              '768': {
-                slidesPerView: 3,
-                spaceBetween: 24,
-              },
-              '1280': {
-                slidesPerView: 3,
-                grid: {
-                  rows: 2,
-                  fill: 'row'
-                },
-                spaceBetween: 24,
-              }
-            }"
-            class="doctors-swiper !pb-12"
-          >
-            <swiper-slide
-              v-for="(doctor, index) in displayedDoctors"
-              :key="doctor.id"
-              class="h-auto"
-            >
-              <div class="doctor-card group h-full flex flex-col border border-border/40 rounded-xl overflow-hidden bg-card/50 hover:bg-card transition-colors">
-                <!-- Image Container -->
-                <div class="relative overflow-hidden aspect-[4/4]">
-                  <img
-                    :src="getImageUrl(doctor.image)"
-                    :alt="doctor.name"
-                    loading="lazy"
-                    class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <!-- Badges -->
-                  <div class="absolute top-4 left-4 z-20 flex flex-col gap-2">
-                    <div class="bg-primary text-primary-foreground px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg transform transition-transform group-hover:scale-105">
-                      <Stethoscope class="w-3.5 h-3.5" />
-                      <span class="text-xs font-bold tracking-wide line-clamp-1 max-w-[150px]">{{ doctor.specialty }}</span>
-                    </div>
-                  </div>
-
-                  <div class="absolute top-4 right-4 z-20">
-                     <div class="bg-white/95 backdrop-blur-sm text-foreground px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg border border-primary/20 transform transition-transform group-hover:scale-105">
-                        <BadgeCheck class="w-3.5 h-3.5 text-primary" />
-                        <span class="text-xs font-bold tracking-wide">{{ doctor.experience }}</span>
-                     </div>
-                  </div>
-
-                  <div class="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                  
-                  <!-- Hover Overlay Content -->
-                  <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                    <NuxtLink
-                      :to="`/doctors`"
-                      class="btn-primary w-full justify-center text-sm py-2.5"
-                    >
-                      প্রোফাইল দেখুন
-                      <ArrowRight class="w-4 h-4 ml-2" />
-                    </NuxtLink>
-                  </div>
-                </div>
-
-                <!-- Info -->
-                <div class="p-4 flex-grow flex flex-col justify-between">
-                  <div>
-                    <div class="flex items-center gap-1 mb-2">
-                      <Star class="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span class="text-sm font-medium text-foreground">{{ doctor.rating }}</span>
-                      <span class="text-sm text-muted-foreground">• {{ doctor.experience }}</span>
-                    </div>
-                    <h3 class="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-1" :title="doctor.name">
-                      {{ doctor.name }}
-                    </h3>
-                    <p class="text-sm text-secondary font-medium line-clamp-1" :title="doctor.specialty">{{ doctor.specialty }}</p>
-                  </div>
-
-                  <!-- Footer: Branch Info -->
-                  <div v-if="doctor.branches" class="mt-4 pt-3 border-t border-border/50 flex items-start gap-2">
-                     <MapPin class="w-3.5 h-3.5 text-muted-foreground mt-0.5" />
-                     <div class="text-xs text-muted-foreground">
-                        <p class="font-medium text-foreground/80 line-clamp-1">{{ doctor.branches.name }}</p>
-                        <p class="line-clamp-1 opacity-80" :title="doctor.branches.address">{{ doctor.branches.address }}</p>
-                     </div>
-                  </div>
-                </div>
-              </div>
-            </swiper-slide>
-          </swiper>
-          <template #fallback>
-             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Simple Skeleton/Loading State -->
-                <div v-for="i in 3" :key="i" class="h-[400px] bg-muted/20 animate-pulse rounded-xl"></div>
-             </div>
-          </template>
-        </ClientOnly>
+      <!-- Doctors Grid (3x3) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 lg:gap-8 min-h-[400px]">
+        <DoctorCard 
+          v-for="(doctor, index) in displayedDoctors.slice(0, 9)" 
+          :key="doctor.id" 
+          :doctor="doctor"
+          data-aos="fade-up"
+          :data-aos-delay="index * 100"
+        />
       </div>
 
       <!-- CTA -->
-      <div class="text-center mt-4">
-        <NuxtLink to="/doctors" class="btn-secondary">
+      <div class="text-center mt-8" data-aos="fade-up" data-aos-delay="400">
+        <NuxtLink to="/doctors" class="btn-secondary px-8 py-3 rounded-xl hover:scale-105 active:scale-95 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
           সম্পূর্ণ টিম দেখুন
         </NuxtLink>
       </div>
@@ -188,10 +76,7 @@ const getImageUrl = (path: string) => {
 </template>
 
 <style scoped>
-/* Ensure slides have equal height */
-:deep(.swiper-wrapper) {
-  height: auto;
-}
+/* Scoped styles removed as standard CSS grid is used */
 </style>
 
 

@@ -3,9 +3,9 @@ import { MapPin, Phone, Mail, Clock, Users, ArrowRight, UserCheck } from 'lucide
 import { supabase } from '@/lib/supabase'
 
 useHead({
-  title: 'শাখা ও অবস্থান',
+  title: 'Branches & Locations | Maa Health Service Center',
   meta: [
-    { name: 'description', content: 'আপনার নিকটস্থ এনএসএস (NSS) মা স্বাস্থ্য সেবা কেন্দ্রের শাখা খুঁজুন।' }
+    { name: 'description', content: 'Find your nearest NSS Maa Health Service Center branch. Convenient healthcare locations in Barguna and Patuakhali.' }
   ]
 })
 
@@ -88,13 +88,13 @@ const getManagerImageUrl = (branchAddress: string) => {
     <!-- Hero Section -->
     <section class="pt-32 pb-16 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       <div class="section-container text-center">
-        <span class="text-secondary font-semibold tracking-wide uppercase text-sm">
+        <span class="text-secondary font-semibold tracking-wide uppercase text-sm" data-aos="fade-down" data-aos-delay="0">
           আমাদের অবস্থান
         </span>
-        <h1 class="heading-xl text-foreground mt-3 mb-6">
+        <h1 class="heading-xl text-foreground mt-3 mb-6" data-aos="fade-down" data-aos-delay="100">
           হাসপাতাল শাখাসমূহ
         </h1>
-        <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
+        <p class="text-muted-foreground text-lg max-w-2xl mx-auto" data-aos="fade-down" data-aos-delay="200">
           আপনার নিকটস্থ এনএসএস মা স্বাস্থ্য সেবা কেন্দ্র খুঁজুন। আমাদের প্রতিটি শাখাই একই উচ্চ মানের সেবার সাথে ব্যাপক চিকিৎসা সেবা প্রদান করে।
         </p>
       </div>
@@ -138,135 +138,17 @@ const getManagerImageUrl = (branchAddress: string) => {
           <div 
             v-for="(branch, index) in filteredBranches"
             :key="branch.address"
-            class="flex flex-col lg:flex-row gap-8 items-stretch card-hover p-0 overflow-hidden"
-            :class="{ 'lg:flex-row-reverse': index % 2 === 1 }"
+            class="h-full"
+            data-aos="fade-up"
+            data-aos-offset="100"
           >
-            <!-- Image -->
-            <div class="w-full lg:w-2/5 relative group">
-              <img
-                :src="getImageUrl(branch.image)"
-                :alt="branch.name"
-                loading="lazy"
-                class="w-full h-64 lg:h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <!-- Doctors Badge -->
-              <div v-if="getDoctorCount(branch.address) > 0" class="absolute top-6 left-6 flex -space-x-3 z-10 transition-transform duration-300 group-hover:scale-105">
-                <img 
-                  v-for="doctor in getBranchDoctors(branch.address)"
-                  :key="doctor.id"
-                  :src="getImageUrl(doctor.image)"
-                  :alt="doctor.name"
-                  class="w-10 h-10 rounded-full border-2 border-background object-cover shadow-md"
-                  :title="doctor.name"
-                />
-                <div v-if="getDoctorCount(branch.address) > 3" class="w-10 h-10 rounded-full border-2 border-background bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shadow-md">
-                  +{{ getDoctorCount(branch.address) - 3 }}
-                </div>
-              </div>
-              
-              <!-- Manager Badge -->
-              <div v-if="getManager(branch.address)" class="absolute bottom-6 right-6 bg-white/95 backdrop-blur-sm rounded-lg px-3 py-2 flex items-center gap-2 shadow-lg z-10 border border-primary/20">
-                <img 
-                  v-if="getManagerImageUrl(branch.address)"
-                  :src="getManagerImageUrl(branch.address)"
-                  :alt="getManager(branch.address)?.name || 'Manager'"
-                  class="w-8 h-8 rounded-full object-cover border-2 border-primary"
-                />
-                <div class="text-left">
-                  <div class="text-[10px] text-muted-foreground uppercase tracking-wide">Manager</div>
-                  <div class="text-sm font-semibold text-foreground leading-tight">{{ getManager(branch.address)?.name }}</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Content -->
-            <div class="w-full lg:w-3/5 p-8">
-              <h2 class="heading-md text-foreground mb-4">{{ branch.name }}</h2>
-              
-              <div class="space-y-3 mb-6">
-                <div class="flex items-start gap-3">
-                  <MapPin class="w-5 h-5 text-primary mt-0.5" />
-                  <span class="text-muted-foreground">{{ branch.address }}</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <Phone class="w-5 h-5 text-primary" />
-                  <a :href="`tel:${branch.phone}`" class="text-muted-foreground hover:text-primary transition-colors">
-                    {{ branch.phone }}
-                  </a>
-                </div>
-                <div class="flex items-center gap-3">
-                  <Mail class="w-5 h-5 text-primary" />
-                  <a :href="`mailto:${branch.email}`" class="text-muted-foreground hover:text-primary transition-colors">
-                    {{ branch.email }}
-                  </a>
-                </div>
-                 <template v-if="getManager(branch.address)">
-                   <div class="flex items-center gap-3">
-                    <UserCheck class="w-5 h-5 text-primary" />
-                    <div class="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5 border border-border/50">
-                      <img 
-                        v-if="getManagerImageUrl(branch.address)"
-                        :src="getManagerImageUrl(branch.address)"
-                        :alt="getManager(branch.address)?.name || 'Manager'"
-                        class="w-6 h-6 rounded-full object-cover border border-primary/30"
-                      />
-                      <div class="flex flex-col">
-                        <span class="text-[10px] text-muted-foreground uppercase tracking-wide leading-none">Manager</span>
-                        <span class="text-sm font-medium text-foreground leading-tight">{{ getManager(branch.address)?.name }}</span>
-                      </div>
-                    </div>
-                   </div>
-                 </template>
-                 <div class="flex items-center gap-3">
-                   <Clock class="w-5 h-5 text-primary" />
-                   <span class="text-muted-foreground">২৪/৭ খোলা</span>
-                 </div>
-               </div>
-
-
-              <!-- Doctors at this branch -->
-              <div class="border-t border-border pt-6 mb-6">
-                <div class="flex items-center gap-2 mb-4">
-                  <Users class="w-5 h-5 text-secondary" />
-                  <span class="font-medium text-foreground">
-                    {{ getDoctorCount(branch.address) }} ডাক্তার এই শাখায় আছেন
-                  </span>
-                </div>
-                
-                <div class="flex -space-x-3 mb-4">
-                    <img
-                    v-for="doctor in getBranchDoctors(branch.address)"
-                    :key="doctor.id"
-                    :src="getImageUrl(doctor.image)"
-                    :alt="doctor.name"
-                    loading="lazy"
-                    class="w-12 h-12 rounded-full border-2 border-background object-cover"
-                    :title="doctor.name"
-                  />
-                  <div v-if="getDoctorCount(branch.address) > 3" class="w-12 h-12 rounded-full border-2 border-background bg-muted flex items-center justify-center text-sm font-medium text-muted-foreground">
-                    +{{ getDoctorCount(branch.address) - 3 }}
-                  </div>
-                </div>
-              </div>
-
-              <div class="flex flex-wrap gap-4">
-                <NuxtLink 
-                  :to="`/doctors?branch=${branch.address}`"
-                  class="btn-primary inline-flex items-center gap-2"
-                >
-                  ডাক্তারদের দেখুন
-                  <ArrowRight class="w-4 h-4" />
-                </NuxtLink>
-                <a 
-                  :href="branch.map_url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="btn-ghost"
-                >
-                  দিকের নির্দেশনা পান
-                </a>
-              </div>
-            </div>
+            <!-- Pass doctors array; component handles filtering -->
+             <LazyBranchCard 
+              :branch="branch" 
+              :doctors="doctors || []"
+              layout="horizontal"
+              :flipped="index % 2 !== 0"
+             />
           </div>
         </div>
       </div>

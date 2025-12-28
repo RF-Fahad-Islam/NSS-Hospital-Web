@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { Star, MapPin, Calendar, ArrowRight } from 'lucide-vue-next'
 // import { doctors, branches } from '@/data/hospitalData' // Replaced with Supabase
 import { supabase } from '@/lib/supabase'
 import { useBranchModal } from '~/composables/useBranchModal'
@@ -22,12 +21,13 @@ interface Doctor {
     name: string
   } | null
   role?: 'doctor' | 'staff' | 'management'
+  sequence?: number | null
 }
 
 useHead({
-  title: 'আমাদের ডাক্তার ও স্টাফ',
+  title: 'Our Doctors and Staff | Maa Health Service Center',
   meta: [
-    { name: 'description', content: 'এনএসএস (NSS) এর বিশেষজ্ঞ ডাক্তার এবং দক্ষ স্টাফদের সাথে পরিচিত হোন।' }
+    { name: 'description', content: 'Meet our team of expert doctors and dedicated staff at NSS Maa Health Service Center.' }
   ]
 })
 
@@ -103,7 +103,32 @@ const filteredDoctors = computed(() => {
     )
   }
   
-  return list
+  // Sort by Role Priority and then by Sequence
+  const rolePriority: Record<string, number> = {
+    'management': 1,
+    'doctor': 2,
+    'staff': 3
+  }
+
+  return [...list].sort((a, b) => {
+    const roleA = a.role || 'staff'
+    const roleB = b.role || 'staff'
+    
+    if (rolePriority[roleA] !== rolePriority[roleB]) {
+      return (rolePriority[roleA] || 99) - (rolePriority[roleB] || 99)
+    }
+    
+    // If same role, sort by sequence
+    const seqA = a.sequence ?? 999999
+    const seqB = b.sequence ?? 999999
+    
+    if (seqA !== seqB) {
+      return seqA - seqB
+    }
+
+    // Fallback to name if sequence is same
+    return a.name.localeCompare(b.name)
+  })
 })
 
 const getBranchName = (branchId: string) => {
@@ -124,13 +149,6 @@ watch(() => route.query.branch, (newBranch) => {
     selectedBranch.value = 'all'
   }
 })
-
-const getImageUrl = (path: string) => {
-  if (!path) return ''
-  if (path.startsWith('http')) return path
-  const { data } = supabase.storage.from('doctors').getPublicUrl(path)
-  return data.publicUrl
-}
 </script>
 
 <template>
@@ -142,7 +160,7 @@ const getImageUrl = (path: string) => {
           আমাদের মেডিকেল টিম
         </span>
         <h1 class="heading-xl text-foreground mt-3 mb-6">
-          আমাদের মেডিকেল স্টাফদের সাথে পরিচিত হোন
+          আমাদের বিশেষজ্ঞদের সাথে পরিচিত হোন
         </h1>
         <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
           আমাদের উচ্চ যোগ্যতাসম্পন্ন চিকিৎসকদের দল দীর্ঘদিনের অভিজ্ঞতা এবং আপনার সুস্থতার প্রতি অকৃত্রিম প্রতিশ্রুতি নিয়ে সেবা প্রদান করেন।
@@ -250,53 +268,8 @@ const getImageUrl = (path: string) => {
             <p class="text-muted-foreground text-lg">আপনার মানদণ্ডের সাথে মিলে এমন কোনও ডাক্তার পাওয়া যায়নি।</p>
           </div>
           <div v-else class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div v-for="doctor in filteredDoctors" :key="doctor.id" class="doctor-card group">
-              <!-- Image Container -->
-              <div class="relative overflow-hidden aspect-[4/5]">
-                <img
-                  :src="getImageUrl(doctor.image)"
-                  :alt="doctor.name"
-                  loading="lazy"
-                  class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                />
-                <div class="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
-
-              <!-- Info -->
-              <div class="p-6">
-                <div class="flex items-center gap-1 mb-3">
-                  <Star class="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <span class="text-sm font-medium text-foreground">{{ doctor.rating }}</span>
-                  <span class="text-sm text-muted-foreground">• {{ doctor.experience }}</span>
-                </div>
-                
-                <h3 class="text-xl font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
-                  {{ doctor.name }}
-                </h3>
-                <p class="text-secondary font-medium mb-3">{{ doctor.specialty }}</p>
-                
-                <div class="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                  <MapPin class="w-4 h-4" />
-                  <span>{{ doctor.branches?.address || getBranchName(doctor.branch_id) }}</span>
-                </div>
-
-                <div class="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                  <Calendar class="w-4 h-4" />
-                  <span>{{ doctor.available_days ? doctor.available_days.join(', ') : '' }}</span>
-                </div>
-
-                <p class="text-muted-foreground text-sm mb-4 line-clamp-2">
-                  {{ doctor.bio }}
-                </p>
-
-                <NuxtLink 
-                  :to="`/doctors/${doctor.id}`"
-                  class="inline-flex items-center gap-2 text-primary font-medium text-sm hover:gap-3 transition-all"
-                >
-                  সম্পূর্ণ প্রোফাইল দেখুন
-                  <ArrowRight class="w-4 h-4" />
-                </NuxtLink>
-              </div>
+            <div v-for="doctor in filteredDoctors" :key="doctor.id">
+              <LazyDoctorCard :doctor="doctor" />
             </div>
           </div>
           <template #fallback>

@@ -53,9 +53,9 @@ const navLinks = [
   <header
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
     :class="[
-      isScrolled
-        ? 'bg-card/95 backdrop-blur-md shadow-medical'
-        : 'bg-transparent'
+      (isScrolled || isMobileMenuOpen)
+        ? 'bg-card/95 backdrop-blur-md shadow-medical border-b border-border/50'
+        : 'bg-card/95 backdrop-blur-md lg:bg-transparent lg:backdrop-blur-none lg:shadow-none'
     ]"
   >
     <div class="section-container">
@@ -89,10 +89,10 @@ const navLinks = [
             <span>Dashboard</span>
           </NuxtLink>
 
-          <a href="tel:+1234567890" class="btn-ghost gap-2">
+          <!-- <a href="tel:+1234567890" class="btn-ghost gap-2">
             <Phone class="w-4 h-4" />
             <span>জরুরী সেবা</span>
-          </a>
+          </a> -->
           <button @click="openModal" class="btn-primary">
             অ্যাপয়েন্টমেন্ট নিন
           </button>

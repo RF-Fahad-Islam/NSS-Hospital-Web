@@ -41,9 +41,9 @@ interface Service {
 }
 
 useHead({
-  title: 'আমাদের চিকিৎসা সেবাসমূহ',
+  title: 'Our Medical Services | Compassionate Care Hub',
   meta: [
-    { name: 'description', content: 'নিরাপদ এমআর, মাতৃত্ব এবং পরিবার পরিকল্পনা সহ এনএসএস (NSS) এর ব্যাপক চিকিৎসা সেবা অন্বেষণ করুন।' }
+    { name: 'description', content: 'Explore comprehensive medical services including safe MR, maternity care, and family planning offered by NSS.' }
   ]
 })
 
@@ -54,12 +54,7 @@ const { data: services } = await useAsyncData<Service[]>('services-page', async 
   return (data as any) || []
 })
 
-const { data: doctors } = await useAsyncData('doctors-all', async () => {
-  const { data } = await supabase
-    .from('doctors')
-    .select('*')
-  return (data as any[]) || []
-})
+
 
 const getIcon = (name: string) => {
   return iconMap[name] || Stethoscope
@@ -85,47 +80,9 @@ const getServiceColors = (service: any) => {
   return { bg: 'bg-primary/10', color: 'text-primary' }
 }
 
-const getImageUrl = (path: string) => {
-  if (!path) return ''
-  if (path.startsWith('http')) return path
-  const { data } = supabase.storage.from('doctors').getPublicUrl(path)
-  return data.publicUrl
-}
 
-const getDoctorsForService = (service: Service) => {
-  const list = doctors.value || []
-  if (!list.length) return []
 
-  // Mapping logic
-  // 1. Matrology/Baby -> Pediatrician
-  // 2. Heart -> Cardiologist
-  // 3. Brain -> Neurologist
-  // 4. Bone -> Orthopedic
-  // 5. Eye -> Ophthalmologist
-  
-  return list.filter(d => {
-    // Check if doctor specialty is loosely related to service title or icon
-    const specialty = (d.specialty || '').toLowerCase()
-    const title = (service.title || '').toLowerCase()
-    const icon = (service.icon_name || '').toLowerCase()
-    
-    // Explicit mapping for known demo data types
-    if (icon.includes('baby') && specialty.includes('pedia')) return true
-    if (icon.includes('heart') && (specialty.includes('cardio') || specialty.includes('heart'))) return true
-    if (icon.includes('brain') && (specialty.includes('neuro') || specialty.includes('brain'))) return true
-    if (icon.includes('bone') && (specialty.includes('ortho') || specialty.includes('bone'))) return true
-    if (icon.includes('eye') && (specialty.includes('ophth') || specialty.includes('eye'))) return true
-    if (title.includes('maternity') && (specialty.includes('obs') || specialty.includes('gyn') || specialty.includes('maternity'))) return true
-    
-    // Fallback: simple text match
-    if (title.includes(specialty) || specialty.includes(title)) return true
-    
-    // Fallback 2: Check if doctor has a 'service_id' or similar if we added it (we haven't yet, but good for future)
-    // For now, let's keep it simple.
-    
-    return false
-  })
-}
+
 
 
 </script>
@@ -190,6 +147,9 @@ const getDoctorsForService = (service: Service) => {
                   <span class="text-foreground">{{ feature }}</span>
                 </div>
               </div>
+
+              <!-- Related Doctors -->
+
 
               <button
                 @click="openModal"

@@ -54,7 +54,11 @@ const topPagePercentage = (count: number) => {
     <!-- Top Stats Row -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <!-- Total Visits -->
-      <div class="bg-card rounded-xl border border-border p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div 
+        class="bg-card rounded-xl border border-border p-6 shadow-sm hover:shadow-md transition-all hover:scale-[1.02] duration-300"
+        data-aos="zoom-in-up"
+        data-aos-delay="0"
+      >
         <div class="flex items-center justify-between mb-4">
           <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
             <Activity class="w-5 h-5 text-blue-600" />
@@ -68,7 +72,11 @@ const topPagePercentage = (count: number) => {
       </div>
 
       <!-- Today's Visits -->
-      <div class="bg-card rounded-xl border border-border p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div 
+        class="bg-card rounded-xl border border-border p-6 shadow-sm hover:shadow-md transition-all hover:scale-[1.02] duration-300"
+        data-aos="zoom-in-up"
+        data-aos-delay="100"
+      >
         <div class="flex items-center justify-between mb-4">
           <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
             <Users class="w-5 h-5 text-green-600" />
@@ -83,7 +91,11 @@ const topPagePercentage = (count: number) => {
       </div>
 
       <!-- Weekly Avg -->
-      <div class="bg-card rounded-xl border border-border p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div 
+        class="bg-card rounded-xl border border-border p-6 shadow-sm hover:shadow-md transition-all hover:scale-[1.02] duration-300"
+        data-aos="zoom-in-up"
+        data-aos-delay="200"
+      >
          <div class="flex items-center justify-between mb-4">
           <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
             <TrendingUp class="w-5 h-5 text-purple-600" />

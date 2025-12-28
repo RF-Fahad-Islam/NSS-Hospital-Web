@@ -16,13 +16,13 @@ nuxtApp.hook('page:start', () => {
 nuxtApp.hook('page:finish', () => {
   setTimeout(() => {
     loading.value = false
-  }, 800) // Small delay to let the animation play and feel smooth
+  }, 300) // Reduced delay for faster feel
 })
 
 onMounted(() => {
   setTimeout(() => {
     loading.value = false
-  }, 1000) // Initial load delay
+  }, 500) // Reduced initial load delay
 })
 </script>
 

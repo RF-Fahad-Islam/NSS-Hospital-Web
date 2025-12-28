@@ -77,20 +77,20 @@ const getServiceColors = (service: any) => {
   <section id="services" class="section-padding bg-muted/30">
     <div class="section-container">
       <!-- Section Header -->
-      <div class="text-center max-w-2xl mx-auto mb-16">
+      <div class="text-center max-w-2xl mx-auto mb-16" data-aos="fade-up">
         <span class="text-secondary font-semibold tracking-wide uppercase text-sm">
           আমাদের বিশেষত্ব
         </span>
         <h2 class="heading-lg text-foreground mt-3 mb-4">
-          ব্যাপক চিকিৎসা সেবা
+          সকল চিকিৎসা সেবা
         </h2>
         <p class="text-muted-foreground text-lg">
-          আমরা অত্যাধুনিক প্রযুক্তি এবং বিশেষজ্ঞ সেবার মাধ্যমে একই ছাদের নিচে আপনার সমস্ত স্বাস্থ্যসেবা নিশ্চিত করি।
+          আধুনিক চিকিৎসা প্রযুক্তি ও অভিজ্ঞ বিশেষজ্ঞদের তত্ত্বাবধানে আমরা একই ছাদের নিচে নারীদের জন্য নিরাপদ, সম্পূর্ণ গোপনীয় ও মানসম্মত স্বাস্থ্যসেবা প্রদান করি।
         </p>
       </div>
 
       <!-- Services Slider -->
-      <div class="relative">
+      <div class="relative" data-aos="zoom-in-up" data-aos-delay="200">
         <Swiper
           :modules="[Autoplay, Pagination]"
           :slides-per-view="1"
@@ -122,7 +122,7 @@ const getServiceColors = (service: any) => {
             class="h-auto"
           >
             <div 
-              class="service-card group cursor-pointer h-full min-h-[320px] p-8 flex flex-col"
+              class="service-card group cursor-pointer h-full min-h-[320px] p-8 flex flex-col hover:scale-[1.02]"
             >
               <div 
                 class="w-16 h-16 rounded-xl flex items-center justify-center transition-all duration-300 mb-6 group-hover:bg-primary group-hover:text-primary-foreground flex-shrink-0"
@@ -159,7 +159,7 @@ const getServiceColors = (service: any) => {
       </div>
 
       <!-- CTA -->
-      <div class="text-center mt-8">
+      <div class="text-center mt-8" data-aos="fade-up" data-aos-delay="400">
         <NuxtLink to="/services" class="btn-primary">
           সকল সেবা দেখুন
         </NuxtLink>

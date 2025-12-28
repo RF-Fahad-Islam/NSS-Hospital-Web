@@ -278,6 +278,7 @@ async function fetchData() {
     const { data: doctorsData } = await supabase
       .from('doctors')
       .select('*')
+      .eq('role', 'ডাক্তার')
       .order('sequence', { ascending: true, nullsFirst: false })
     
     if (doctorsData) doctors.value = doctorsData

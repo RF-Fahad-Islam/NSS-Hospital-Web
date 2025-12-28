@@ -26,9 +26,9 @@ if (error.value || !doctor.value) {
 }
 
 useHead({
-  title: `${doctor.value.name} - এনএসএস মেডিকেল টিম`,
+  title: `${doctor.value.name} - NSS Medical Team`,
   meta: [
-    { name: 'description', content: `${doctor.value.name}, ${doctor.value.specialty}-এর প্রোফাইল দেখুন এবং অ্যাপয়েন্টমেন্ট বুক করুন।` }
+    { name: 'description', content: `View profile of ${doctor.value.name}, ${doctor.value.specialty} and book an appointment.` }
   ]
 })
 
