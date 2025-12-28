@@ -3,9 +3,9 @@ import { CheckCircle, Heart, Shield, Users, Award } from 'lucide-vue-next'
 import aboutHeroImage from '~/assets/head.jpeg'
 
 useHead({
-  title: 'আমাদের সম্পর্কে | NSS - Ma Shastho Seba Kendra',
+  title: 'আমাদের সম্পর্কে',
   meta: [
-    { name: 'description', content: 'মা স্বাস্থ্য সেবা কেন্দ্র এবং মেরি ক্লিনিক—যত্ন, বিশ্বাস ও নিরাপদ স্বাস্থ্যসেবার প্রতিশ্রুতি।' }
+    { name: 'description', content: 'মা স্বাস্থ্য সেবা কেন্দ্র এবং মেরি ক্লিনিক—যত্ন, বিশ্বাস ও নিরাপদ স্বাস্থ্যসেবার প্রতিশ্রুতি। NSS পরিচালিত সেবাসমূহ।' }
   ]
 })
 

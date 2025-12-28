@@ -3,7 +3,8 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { 
   Bell, Calendar, LogOut, Clock, User, Phone, Mail, 
   CheckCircle, XCircle, Eye, Loader2, Stethoscope, Building2,
-  Plus, Edit, Trash2, X, Save, Search, BarChart3, TrendingUp, Globe, GripVertical
+  Plus, Edit, Trash2, X, Save, Search, BarChart3, TrendingUp, Globe, GripVertical,
+  Heart, Baby, Brain, Bone, Ambulance, Activity, Pill, Microscope, Syringe
 } from 'lucide-vue-next'
 import { format, subDays, startOfDay, endOfDay, eachDayOfInterval } from 'date-fns'
 import { supabase } from '@/lib/supabase'
@@ -11,6 +12,12 @@ import type { Branch, Doctor, Service, BranchForm, DoctorForm, ServiceForm, Gall
 import ImageUpload from '@/components/ImageUpload.vue'
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard.vue'
 import draggable from 'vuedraggable'
+
+const iconMap: Record<string, any> = {
+  Heart, Baby, Brain, Bone, Eye, Stethoscope, Ambulance,
+  Activity, Pill, Microscope, Syringe
+}
+
 
 definePageMeta({
   layout: false
@@ -236,6 +243,11 @@ const fetchServices = async () => {
   }
 }
 
+const getIcon = (name: string) => {
+  return iconMap[name] || Stethoscope
+}
+
+
 const fetchGallery = async () => {
   try {
     const { data, error } = await supabase
@@ -420,7 +432,11 @@ const saveDoctor = async () => {
       
       if (error) throw error
     } else {
-      const id = 'dr-' + doctorForm.value.name.toLowerCase().replace(/[^a-z]+/g, '-')
+      // Generate unique ID with timestamp to prevent duplicates
+      const baseName = doctorForm.value.name.toLowerCase().replace(/[^a-z]+/g, '-')
+      const timestamp = Date.now()
+      const id = `dr-${baseName}-${timestamp}`
+      
       const { error } = await supabase
         .from('doctors')
         .insert({ ...payload, id })
@@ -1141,8 +1157,8 @@ const handleLogout = async () => {
             :key="service.id"
             class="bg-card rounded-xl border border-border p-6 hover:shadow-lg transition-shadow"
           >
-            <div class="w-12 h-12 rounded-xl mb-4 flex items-center justify-center" :class="service.bg_color">
-              <div :class="service.color" class="text-2xl">{{ service.icon_name }}</div>
+            <div class="w-12 h-12 rounded-xl mb-4 flex items-center justify-center shadow-sm" :class="service.bg_color">
+              <component :is="getIcon(service.icon_name)" class="w-6 h-6" :class="service.color" />
             </div>
             <h3 class="font-semibold text-lg text-foreground mb-2">{{ service.title }}</h3>
             <p class="text-sm text-muted-foreground mb-4 line-clamp-2">{{ service.description }}</p>

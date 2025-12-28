@@ -5,6 +5,9 @@ import {
   Phone, Mail, CalendarCheck
 } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
+import { useBranchModal } from '~/composables/useBranchModal'
+
+const { openModal } = useBranchModal()
 
 const route = useRoute()
 const doctorId = route.params.id as string
@@ -48,6 +51,8 @@ const translateDay = (day: string) => {
   }
   return days[day] || day
 }
+
+
 </script>
 
 <template>
@@ -106,13 +111,13 @@ const translateDay = (day: string) => {
             <p class="opacity-90 mb-6 text-sm leading-relaxed">
               বিশেষজ্ঞ চিকিৎসার জন্য আজই {{ doctor.name }}-এর সাথে অ্যাপয়েন্টমেন্ট নিন।
             </p>
-            <NuxtLink 
-              to="/#appointment" 
+            <button
+              @click="openModal"
               class="w-full py-3 bg-white text-primary font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-opacity-90 transition-all shadow-md group"
             >
               বুক করুন
               <ArrowLeft class="w-4 h-4 rotate-180 transition-transform group-hover:translate-x-1" />
-            </NuxtLink>
+            </button>
           </div>
         </div>
 

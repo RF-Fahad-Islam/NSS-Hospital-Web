@@ -2,9 +2,10 @@
 import { Building2, Users, Target, Heart, Shield, Globe, MapPin, Phone, Mail } from 'lucide-vue-next'
 
 useHead({
-  title: 'NSS - People Participation for Social Change',
+  title: 'সামাজিক পরিবর্তনের অগ্রদূত',
   meta: [
-    { name: 'description', content: 'Nazrul Smriti Sangsad (NSS) - A social welfare organization working for disadvantaged rural and urban poor people.' }
+    { name: 'description', content: 'নজরুল স্মৃতি সংসদ (NSS) - একটি সমাজকল্যাণমূলক সংস্থা যা সুবিধাবঞ্চিত গ্রামীণ এবং শহুরে দরিদ্র মানুষদের উন্নয়নে কাজ করে।' },
+    { name: 'keywords', content: 'NSS, NGO, social welfare, development, Bangladesh, poverty alleviation' }
   ]
 })
 

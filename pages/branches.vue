@@ -3,9 +3,9 @@ import { MapPin, Phone, Mail, Clock, Users, ArrowRight, UserCheck } from 'lucide
 import { supabase } from '@/lib/supabase'
 
 useHead({
-  title: 'আমাদের অবস্থান - এনএসএস মা স্বাস্থ্য সেবা কেন্দ্র',
+  title: 'শাখা ও অবস্থান',
   meta: [
-    { name: 'description', content: 'আপনার নিকটস্থ এনএসএস মা স্বাস্থ্য সেবা কেন্দ্রের শাখা খুঁজুন।' }
+    { name: 'description', content: 'আপনার নিকটস্থ এনএসএস (NSS) মা স্বাস্থ্য সেবা কেন্দ্রের শাখা খুঁজুন।' }
   ]
 })
 
@@ -65,7 +65,7 @@ const getManager = (branchAddress: string) => {
 }
 
 const getBranchDoctors = (branchId: string) => {
-  return (doctors.value || []).filter((d) => d.branch_id === branchId).slice(0, 3)
+  return (doctors.value || []).filter((d) => d.branch_id === branchId && d.role === 'doctor').slice(0, 3)
 }
 
 const getImageUrl = (path: string) => {
@@ -149,9 +149,19 @@ const getManagerImageUrl = (branchAddress: string) => {
                 loading="lazy"
                 class="w-full h-64 lg:h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div class="absolute top-6 left-6 bg-primary text-primary-foreground px-4 py-2 rounded-full flex items-center gap-2 shadow-lg z-10">
-                <Users class="w-4 h-4" />
-                <span class="text-sm font-bold tracking-wide">{{ getDoctorCount(branch.address) }} ডাক্তার</span>
+              <!-- Doctors Badge -->
+              <div v-if="getDoctorCount(branch.address) > 0" class="absolute top-6 left-6 flex -space-x-3 z-10 transition-transform duration-300 group-hover:scale-105">
+                <img 
+                  v-for="doctor in getBranchDoctors(branch.address)"
+                  :key="doctor.id"
+                  :src="getImageUrl(doctor.image)"
+                  :alt="doctor.name"
+                  class="w-10 h-10 rounded-full border-2 border-background object-cover shadow-md"
+                  :title="doctor.name"
+                />
+                <div v-if="getDoctorCount(branch.address) > 3" class="w-10 h-10 rounded-full border-2 border-background bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shadow-md">
+                  +{{ getDoctorCount(branch.address) - 3 }}
+                </div>
               </div>
               
               <!-- Manager Badge -->

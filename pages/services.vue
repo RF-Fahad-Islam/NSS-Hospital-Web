@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ArrowRight, CheckCircle } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
+import { useBranchModal } from '~/composables/useBranchModal'
+
+const { openModal } = useBranchModal()
 import { 
   Heart, Baby, Brain, Bone, Eye, Stethoscope, Ambulance,
   Activity, Pill, Microscope, Syringe
@@ -38,9 +41,9 @@ interface Service {
 }
 
 useHead({
-  title: 'আমাদের সেবাসমূহ - এনএসএস মা স্বাস্থ্য সেবা কেন্দ্র',
+  title: 'আমাদের চিকিৎসা সেবাসমূহ',
   meta: [
-    { name: 'description', content: 'নিরাপদ এমআর, মাতৃত্ব এবং পরিবার পরিকল্পনা সহ আমাদের ব্যাপক চিকিৎসা সেবা অন্বেষণ করুন।' }
+    { name: 'description', content: 'নিরাপদ এমআর, মাতৃত্ব এবং পরিবার পরিকল্পনা সহ এনএসএস (NSS) এর ব্যাপক চিকিৎসা সেবা অন্বেষণ করুন।' }
   ]
 })
 
@@ -123,6 +126,8 @@ const getDoctorsForService = (service: Service) => {
     return false
   })
 }
+
+
 </script>
 
 <template>
@@ -186,13 +191,13 @@ const getDoctorsForService = (service: Service) => {
                 </div>
               </div>
 
-              <NuxtLink 
-                to="/#appointment" 
+              <button
+                @click="openModal"
                 class="btn-primary inline-flex items-center gap-2"
               >
                 অ্যাপয়েন্টমেন্ট নিন
                 <ArrowRight class="w-4 h-4" />
-              </NuxtLink>
+              </button>
             </div>
           </div>
         </div>
@@ -212,9 +217,9 @@ const getDoctorsForService = (service: Service) => {
           <a href="tel:+1234567890" class="inline-flex items-center justify-center px-6 py-3 bg-transparent border-2 border-emerald-400 text-emerald-400 font-semibold rounded-lg transition-all duration-300 hover:bg-emerald-400 hover:text-emerald-950 hover:-translate-y-0.5">
             এখনই কল করুন
           </a>
-          <NuxtLink to="/#appointment" class="btn-secondary">
+          <button @click="openModal" class="btn-secondary">
             পরামর্শের সময়সূচী করুন
-          </NuxtLink>
+          </button>
         </div>
       </div>
     </section>

@@ -15,6 +15,18 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      titleTemplate: '%s - NSS',
+      htmlAttrs: {
+        lang: 'bn'
+      },
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'NSS পরিচালিত মা স্বাস্থ্য সেবা কেন্দ্র ও মেরি ক্লিনিক। নিরাপদ মাতৃত্ব ও পারিবারিক স্বাস্থ্যসেবায় অঙ্গীকারবদ্ধ।' },
+        { name: 'keywords', content: 'NSS, hospital, clinic, healthcare, doctor, Bangladesh, medical services, maternity' },
+        { property: 'og:site_name', content: 'NSS' },
+        { property: 'og:locale', content: 'bn_BD' }
+      ],
       link: [
         { rel: 'icon', type: 'image/png', href: '/favicon.png' },
         { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap' }

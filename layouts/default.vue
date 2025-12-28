@@ -9,5 +9,6 @@
       <slot />
     </main>
     <Footer />
+    <BranchCallModal />
   </div>
 </template>

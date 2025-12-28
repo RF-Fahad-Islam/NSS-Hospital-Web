@@ -32,7 +32,7 @@ const stats = [
             <span class="block text-5xl md:text-7xl font-extrabold tracking-tight mb-2">NSS <small class="tracking-tight font-extralight text-[33px] text-muted">পরিচালিত</small></span> 
             <span class="block text-3xl md:text-5xl font-bold tracking-tight mb-4">মা স্বাস্থ্য সেবা কেন্দ্র</span>
             <span class="block text-3xl md:text-5xl font-bold tracking-tight mb-4">মেরি ক্লিনিক</span>
-            <span class="text-secondary-foreground/90 text-2xl md:text-3xl font-medium block">সামাজিক পরিবর্তনের জন্য জনগণের অংশগ্রহণ</span>
+            <span class="text-secondary-foreground/90 text-2xl md:text-3xl font-medium block">নিরাপদ মাতৃত্ব ও পরিবারিক স্বাস্থ্যসেবায় অঙ্গীকারবদ্ধ</span>
           </h1>
 
           <p class="text-lg md:text-xl text-primary-foreground/80 mb-10 max-w-xl animate-fade-up opacity-0 stagger-2 text-balance">

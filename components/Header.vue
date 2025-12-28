@@ -2,6 +2,9 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Menu, X, Phone, LayoutDashboard } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
+import { useBranchModal } from '~/composables/useBranchModal'
+
+const { openModal } = useBranchModal()
 
 const route = useRoute()
 const isScrolled = ref(false)
@@ -43,6 +46,7 @@ const navLinks = [
 ]
 
 // Adjust href based on page if needed, but in Nuxt /#id usually works well globally
+
 </script>
 
 <template>
@@ -89,9 +93,9 @@ const navLinks = [
             <Phone class="w-4 h-4" />
             <span>জরুরী সেবা</span>
           </a>
-          <a href="#appointment" class="btn-primary">
+          <button @click="openModal" class="btn-primary">
             অ্যাপয়েন্টমেন্ট নিন
-          </a>
+          </button>
         </div>
 
         <!-- Mobile Menu Button -->
@@ -133,9 +137,9 @@ const navLinks = [
               <Phone class="w-4 h-4" />
               <span>জরুরী কল</span>
             </a>
-            <a href="#appointment" class="btn-primary justify-center">
+            <button @click="openModal(); isMobileMenuOpen = false" class="btn-primary justify-center">
               অ্যাপয়েন্টমেন্ট নিন
-            </a>
+            </button>
           </div>
         </nav>
       </div>

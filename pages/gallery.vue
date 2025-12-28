@@ -5,9 +5,9 @@ import { X } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
 useHead({
-  title: 'গ্যালারি - এনএসএস মা স্বাস্থ্য সেবা কেন্দ্র',
+  title: 'হাসপাতাল গ্যালারি',
   meta: [
-    { name: 'description', content: 'আমাদের সুবিধার ভার্চুয়াল ট্যুর।' }
+    { name: 'description', content: 'এনএসএস (NSS) মা স্বাস্থ্য সেবা কেন্দ্র এবং মেরি ক্লিনিক এর আধুনিক সুবিধাসমূহের ভার্চুয়াল ট্যুর।' }
   ]
 })
 

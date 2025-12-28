@@ -165,7 +165,7 @@
         </div>
 
         <!-- Quick Suggestions -->
-        <div v-if="messages.length === 1" class="quick-suggestions">
+        <div v-if="messages.length === 1 || conversationState === 'awaiting_branch'" class="quick-suggestions">
           <button
             v-for="(suggestion, index) in quickSuggestions"
             :key="index"
@@ -220,6 +220,8 @@ const isChatOpen = ref(false)
 const userInput = ref('')
 const isTyping = ref(false)
 const messagesContainer = ref<HTMLElement | null>(null)
+const conversationState = ref<'normal' | 'awaiting_branch'>('normal')
+const pendingQuery = ref('')
 
 // Language preference - Bangla is primary (default)
 const preferredLanguage = ref<'bn' | 'en'>('bn')
@@ -239,6 +241,13 @@ const messages = ref<Message[]>([
 
 // Quick suggestions based on language
 const quickSuggestions = computed(() => {
+  if (conversationState.value === 'awaiting_branch') {
+     const branchOptions = branches.value.map(b => `${b.name} - ${b.address}`)
+     return preferredLanguage.value === 'bn' 
+       ? [...branchOptions, 'সব ডাক্তার দেখান'] 
+       : [...branchOptions, 'Show All Doctors']
+  }
+
   if (preferredLanguage.value === 'bn') {
     return [
       'সেবা দেখান',
@@ -382,6 +391,55 @@ function detectLanguage(query: string): 'bn' | 'en' | 'mixed' {
 function generateResponse(query: string): string {
   // Use preferred language instead of detecting from query
   const lang = preferredLanguage.value
+
+  // Handle Branch Selection State
+  if (conversationState.value === 'awaiting_branch') {
+    // Check if user wants to see all
+    if (
+      query.toLowerCase().includes('all') || 
+      query.includes('সব') ||
+      query.toLowerCase().includes('show all')
+    ) {
+      conversationState.value = 'normal'
+      const originalQuery = pendingQuery.value || query // Fallback just in case
+      pendingQuery.value = ''
+      return generateDoctorsResponse(lang, originalQuery)
+    }
+
+    // Check if query matches a branch name
+    const branch = branches.value.find(b => 
+      query.toLowerCase().includes(b.name.toLowerCase()) || 
+      b.name.toLowerCase().includes(query.toLowerCase())
+    )
+
+    if (branch) {
+      conversationState.value = 'normal'
+      const originalQuery = pendingQuery.value || query
+      pendingQuery.value = ''
+      return generateDoctorsResponse(lang, originalQuery, branch.id)
+    }
+
+    // If matches other intents, switch context (reset state)
+    const isOtherIntent = 
+      query.includes('সেবা') || query.includes('service') ||
+      (query.includes('ডাক্তার') && !query.includes('তালিকা')) || 
+      query.includes('doctor') ||
+      query.includes('অ্যাপয়েন্টমেন্ট') || query.includes('appointment') ||
+      query.includes('contact') || query.includes('যোগাযোগ')
+
+    if (isOtherIntent) {
+      conversationState.value = 'normal'
+      pendingQuery.value = ''
+      // Fall through to normal processing
+    } else {
+      // Still waiting for branch, but input didn't match. Ask again.
+      if (lang === 'bn') {
+        return 'দয়া করে একটি সঠিক শাখার নাম নির্বাচন করুন, অথবা "সব ডাক্তার দেখান" লিখুন।'
+      } else {
+        return 'Please select a valid branch name, or type "Show All Doctors".'
+      }
+    }
+  }
   
   // Services query
   if (
@@ -400,7 +458,24 @@ function generateResponse(query: string): string {
     query.includes('specialist') ||
     query.includes('চিকিৎসক')
   ) {
-    return generateDoctorsResponse(lang, query)
+    // Check if branch is already mentioned in the query
+    const branch = branches.value.find(b => 
+      query.toLowerCase().includes(b.name.toLowerCase()) || 
+      b.name.toLowerCase().includes(query.toLowerCase())
+    )
+
+    if (branch) {
+      return generateDoctorsResponse(lang, query, branch.id)
+    }
+
+    // Ask for branch
+    conversationState.value = 'awaiting_branch'
+    pendingQuery.value = query // Store original query (e.g. "heart doctors")
+    if (lang === 'bn') {
+      return 'আপনি কোন শাখার ডাক্তারদের তালিকা দেখতে চান? নিচে থেকে একটি শাখা নির্বাচন করুন।'
+    } else {
+      return 'For which branch would you like to see the doctors? Please select a branch from below.'
+    }
   }
   
   // Branches query
@@ -504,21 +579,32 @@ function generateServicesResponse(lang: 'bn' | 'en' | 'mixed'): string {
   }
 }
 
-function generateDoctorsResponse(lang: 'bn' | 'en' | 'mixed', query: string): string {
+function generateDoctorsResponse(lang: 'bn' | 'en' | 'mixed', query: string, branchId?: string): string {
   if (doctors.value.length === 0) {
     return lang === 'bn'
       ? 'আমাদের দক্ষ চিকিৎসক দল রয়েছে। বিস্তারিত জানতে Doctors পেজ দেখুন।'
       : 'We have a team of experienced doctors. Please visit our Doctors page for more information.'
   }
 
-  // Check for specialty query
+  // Filter by Branch if provided
   let filteredDoctors = doctors.value
+  if (branchId) {
+    filteredDoctors = filteredDoctors.filter(d => d.branch_id === branchId)
+    // If no doctors found for branch
+    if (filteredDoctors.length === 0) {
+        return lang === 'bn'
+          ? 'এই শাখায় কোন ডাক্তার পাওয়া যায়নি।'
+          : 'No doctors found for this branch.'
+    }
+  }
+
+  // Check for specialty query
   if (
     query.includes('cardio') ||
     query.includes('heart') ||
     query.includes('হৃদরোগ')
   ) {
-    filteredDoctors = doctors.value.filter((d) =>
+    filteredDoctors = filteredDoctors.filter((d) =>
       d.specialty.toLowerCase().includes('cardio')
     )
   } else if (
@@ -527,7 +613,7 @@ function generateDoctorsResponse(lang: 'bn' | 'en' | 'mixed', query: string): st
     query.includes('pediatric') ||
     query.includes('child')
   ) {
-    filteredDoctors = doctors.value.filter((d) =>
+    filteredDoctors = filteredDoctors.filter((d) =>
       d.specialty.toLowerCase().includes('pediatric')
     )
   }
@@ -541,9 +627,9 @@ function generateDoctorsResponse(lang: 'bn' | 'en' | 'mixed', query: string): st
     .join('<br>')
 
   if (lang === 'bn') {
-    return `আমাদের ডাক্তার:<br><br>${doctorsList}<br><br>সম্পূর্ণ তালিকা দেখতে Doctors পেজ ভিজিট করুন।`
+    return `আমাদের ডাক্তার${branchId ? ' (নির্বাচিত শাখায়)' : ''}:<br><br>${doctorsList}<br><br>সম্পূর্ণ তালিকা দেখতে Doctors পেজ ভিজিট করুন।`
   } else {
-    return `Our Doctors:<br><br>${doctorsList}<br><br>Visit our Doctors page to see the complete list and book appointments.`
+    return `Our Doctors${branchId ? ' (Selected Branch)' : ''}:<br><br>${doctorsList}<br><br>Visit our Doctors page to see the complete list and book appointments.`
   }
 }
 

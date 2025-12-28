@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowRight, Star, MapPin } from 'lucide-vue-next'
+import { ArrowRight, Star, MapPin, Stethoscope, BadgeCheck } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Autoplay, Grid } from 'swiper/modules';
@@ -20,15 +20,10 @@ interface Doctor {
   }
 }
 
-const { data: branches } = await useAsyncData('branches-data', async () => {
-  const { data } = await supabase.from('branches').select('id, name, address').order('sequence', { ascending: true, nullsFirst: false })
-  return data || []
-})
-
 const { data: doctors } = await useAsyncData('doctors-home', async () => {
   const { data } = await supabase
     .from('doctors')
-    .select('*')
+    .select('*, branches(name, address)')
     .eq('role', 'doctor')
     .order('sequence', { ascending: true, nullsFirst: false })
     .limit(18)
@@ -38,11 +33,12 @@ const { data: doctors } = await useAsyncData('doctors-home', async () => {
 
 const displayedDoctors = computed(() => {
   if (!doctors.value) return []
-  return doctors.value.map(d => {
-    const branch = (branches.value || []).find((b: any) => b.id === d.branch_id)
+  return doctors.value.map((d: any) => {
+    // Supabase might return branches as an array or object depending on relation detection
+    const branchData = Array.isArray(d.branches) ? d.branches[0] : d.branches
     return {
       ...d,
-      branches: branch ? { name: branch.name, address: branch.address } : undefined
+      branches: branchData
     }
   })
 })
@@ -117,7 +113,22 @@ const getImageUrl = (path: string) => {
                     loading="lazy"
                     class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div class="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <!-- Badges -->
+                  <div class="absolute top-4 left-4 z-20 flex flex-col gap-2">
+                    <div class="bg-primary text-primary-foreground px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg transform transition-transform group-hover:scale-105">
+                      <Stethoscope class="w-3.5 h-3.5" />
+                      <span class="text-xs font-bold tracking-wide line-clamp-1 max-w-[150px]">{{ doctor.specialty }}</span>
+                    </div>
+                  </div>
+
+                  <div class="absolute top-4 right-4 z-20">
+                     <div class="bg-white/95 backdrop-blur-sm text-foreground px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg border border-primary/20 transform transition-transform group-hover:scale-105">
+                        <BadgeCheck class="w-3.5 h-3.5 text-primary" />
+                        <span class="text-xs font-bold tracking-wide">{{ doctor.experience }}</span>
+                     </div>
+                  </div>
+
+                  <div class="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                   
                   <!-- Hover Overlay Content -->
                   <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
